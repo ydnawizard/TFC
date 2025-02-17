@@ -1,0 +1,11 @@
+Terminal Flash Cards (TFC) is a flash card CLI
+that is written in c. Notably, it has the ability to import
+new card stacks if they are definied correctly in
+an external text file.
+
+There is a menu from which you can modify rules like: which
+side is shown, an answer timer, and shuffling parameters. 
+This menu also lets you view your card stack library and switch
+between stacks.
+
+Written by Andy Weglewski
