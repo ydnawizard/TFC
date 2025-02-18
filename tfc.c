@@ -30,6 +30,14 @@ struct rules{
 	bool repeat;
 };
 
+typedef struct{
+	char* front;
+	char* back;
+	int id;
+}card;
+
+card *deck;
+
 //Initialize rules struct called game rules
 struct rules gameRules;
 
@@ -83,9 +91,54 @@ int readDecks(){
 
 //Opens the slected deck specified in gameRules
 //Passes each card to a global deckFront and deckBack arrays;
-//int readDeck(){
-
-
+int readDeck(){
+	int i=0;
+	int j=0;
+	int lineCount=1;
+	int cardCount=0;
+	char deckPath[100]="./decks/";
+	strcat(deckPath,gameRules.deck);
+	//Creat output window
+	WINDOW * gameWin = newwin(20, 35, 11, 10);
+	//box(settingsWin,0,0);
+	refresh();
+	wrefresh(gameWin);
+	char* front=malloc(sizeof(char));
+	char* back=malloc(sizeof(char));
+	deck=(card*)malloc(sizeof(card));
+	FILE* deckFile;
+	char ch;
+	deckFile=fopen(deckPath,"read");
+	while((ch=fgetc(deckFile))!=EOF){
+		if(ch!='\n'&&lineCount%2!=0){
+			front[i]=ch;
+			i+=1;
+			front=realloc(front,(i+1)*sizeof(char));
+		}else if(ch!='\n'&&lineCount%2==0){
+			back[i]=ch;
+			i+=1;
+			back=realloc(back,(i+1)*sizeof(char));
+		}else if(ch=='\n'&&lineCount%2!=0){
+			front[i]='\0';
+			deck[cardCount].front=malloc(strlen(front)*sizeof(char));
+			wrefresh(gameWin);
+			i=0;
+			lineCount+=1;
+			front=realloc(front,sizeof(char));
+		}else if(ch=='\n'&&lineCount%2==0){
+			back[i]='\0';
+			deck[cardCount].back=malloc(strlen(back)*sizeof(char));
+			strcpy(deck[cardCount].back,back);
+			back=realloc(back,2*sizeof(char));
+			i=0;
+			lineCount+=1;
+			deck[cardCount].id=cardCount;
+			cardCount+=1;
+			deck=realloc(deck,(cardCount+1)*sizeof(card));
+		}
+	}
+	fclose(deckFile);
+}
 
 //Displays a mutable menu of decks
 //Selected deck receives a [x] in the menu display
@@ -97,7 +150,7 @@ int decksMenu(){
 	wrefresh(decksWin);
 	keypad(decksWin, true);
 	int choice;
-	int highlight=2;
+	int highlight=0;
 	int selected=2;
 	while(1){
 		for(int i=0;i<decksLength;i++){
@@ -284,7 +337,10 @@ int rulesMenu(){
 	}
 }
 int playGame(){
+	readDeck();
 }
+
+
 
 //Displays settings menu
 //Selected options  open submenus
