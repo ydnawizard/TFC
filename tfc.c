@@ -10,7 +10,9 @@
 #include <dirent.h> //Directory utilities
 #include <curses.h> //Utilities for terminal based graphics
 
+//###GLOBALS###\\\
 
+//Functions
 //Menu declarations to avoid implicits 
 int mainMenu();
 int settingsMenu();
@@ -20,8 +22,9 @@ int playGame();
 int readDeck();
 int readDecks();
 
+//Structs
 //Define rules struct
-//Stores state in which game is initialized
+//Stores menuState in which game is initialized
 struct rules{
 	char* deck;
 	char* orientation;
@@ -29,32 +32,36 @@ struct rules{
 	bool shuffle;
 	bool repeat;
 };
+//Initialize rules struct called game rules
+struct rules gameRules;
 
+//Card struct that cards read from deck file are passed into
+//Each card gets an id so card based player performance data can
+//be utililized to provide a better learning experience
 typedef struct{
 	char* front;
 	char* back;
 	int id;
 }card;
 
+//Initialize an array of card structs
 card *deck;
 
-//Initialize rules struct called game rules
-struct rules gameRules;
-
-//Globals
-//Decks is an array of all decks in the deck directory
-char** decks;
-int decksLength;
-
-//deckFront is an array of the front of each card in the selected deck (specified in gameRules);
-char** deckFront;
-//deckBack is an array of the back of each card in the selected deck (specified in gameRules);
-char** deckBack;
+//Menu state is a global int used to terminate 
+//while loops that display each menu. Its
+//value changes based on the menu displayed so that
+//the while loop displaying the previous menu is temrinated
+int menuState=1;
 
 //Arrays for what is displayed in each menu
 char* menuOptions[3]={"Play","Settings","Quit"};
 char* settings[3]={"Rules","Decks","Back"};
 char* rules[5]={"Orientation:Front","Timer:None","Shuffle:False","Repeat:False","Back"};
+
+//Decks is an array of all decks in the deck directory
+//Used for menu display and gameplay
+char** decks;
+int decksLength;
 
 //Opens directory and grab names of decks
 //add deck names to a global array called decks
@@ -89,54 +96,78 @@ int readDecks(){
 	return 0;
 }
 
-//Opens the slected deck specified in gameRules
-//Passes each card to a global deckFront and deckBack arrays;
+//Opens the slected deck text file specified in gameRules
+//Passes each card to a global deck array of card structs;
 int readDeck(){
 	int i=0;
 	int j=0;
+	//Count lines relative to position in deck file
 	int lineCount=1;
+	//Count cards relative to position in deck array
 	int cardCount=0;
+	//Create complete deck path with filename from deck att.
+	//in gameRules struct
 	char deckPath[100]="./decks/";
 	strcat(deckPath,gameRules.deck);
-	//Creat output window
-	WINDOW * gameWin = newwin(20, 35, 11, 10);
-	//box(settingsWin,0,0);
-	refresh();
-	wrefresh(gameWin);
+	//Initialize dynamic card front and card back strings;
 	char* front=malloc(sizeof(char));
 	char* back=malloc(sizeof(char));
+	//Allocate memory for global deck of card structs array
 	deck=(card*)malloc(sizeof(card));
-	FILE* deckFile;
+	//Initialize file pointer
+	FILE* deckFile=fopen(deckPath,"read");
+	//Initialize char buffer for read characters
 	char ch;
-	deckFile=fopen(deckPath,"read");
 	while((ch=fgetc(deckFile))!=EOF){
+		//If lineCount is odd, the front of card #cardCount is being read
 		if(ch!='\n'&&lineCount%2!=0){
 			front[i]=ch;
 			i+=1;
+			//realloc to make space for next char
 			front=realloc(front,(i+1)*sizeof(char));
+		//If lineCount is even, the back of card #cardCount is being read
 		}else if(ch!='\n'&&lineCount%2==0){
 			back[i]=ch;
 			i+=1;
+			//realloc to make space for next char
 			back=realloc(back,(i+1)*sizeof(char));
+		//If character is newline and lineCount is odd, put string front into 
+		//deck[cardCount].front
 		}else if(ch=='\n'&&lineCount%2!=0){
+			//the method this function builds strings with requires manual addition
+			//of a null terminator character to the end of the string
 			front[i]='\0';
+			//make space in deck for string front in the card struct
 			deck[cardCount].front=malloc(strlen(front)*sizeof(char));
-			wrefresh(gameWin);
+			//strcpy because using = would assign it a pointer value whos
+			//contents are always changing
+			strcpy(deck[cardCount].front,front);
+			//reset i so next string assignment starts at 0
 			i=0;
+			//move to next line
 			lineCount+=1;
+			//realloc front so it has space for only one char
+			//this effectively erases its previous contents
 			front=realloc(front,sizeof(char));
+		//If character is newline and lineCount is even, put string front into 
+		//deck[cardCount].back
 		}else if(ch=='\n'&&lineCount%2==0){
+			//works the same way as the previous else if, just for card.back
 			back[i]='\0';
 			deck[cardCount].back=malloc(strlen(back)*sizeof(char));
 			strcpy(deck[cardCount].back,back);
 			back=realloc(back,2*sizeof(char));
 			i=0;
 			lineCount+=1;
+			//assign an id number to the card
 			deck[cardCount].id=cardCount;
+			//now that card is fully filled out, move to next card
 			cardCount+=1;
+			//realloc deck to make space for next card
 			deck=realloc(deck,(cardCount+1)*sizeof(card));
 		}
 	}
+	//close/free file pointer
 	fclose(deckFile);
 }
 
@@ -152,7 +183,7 @@ int decksMenu(){
 	int choice;
 	int highlight=0;
 	int selected=2;
-	while(1){
+	while(menuState==3){
 		for(int i=0;i<decksLength;i++){
 			if(i==highlight){
 				wattron(decksWin,A_REVERSE);
@@ -170,6 +201,7 @@ int decksMenu(){
 				break;
 			case KEY_RIGHT:
 				if(highlight==decksLength-1){
+					menuState=2;
 					settingsMenu();
 					break;
 				}else{
@@ -183,7 +215,7 @@ int decksMenu(){
 					break;
 				}
 			case KEY_LEFT:
-				settingsMenu();
+				menuState=2;
 				break;
 			default:
 				break;
@@ -196,7 +228,7 @@ int decksMenu(){
 }
 
 //Displays a mutable menu of game rules
-//Changing the rules changes the state of rules struct gameRules
+//Changing the rules changes the menuState of rules struct gameRules
 int rulesMenu(){
 	//Creat output window
 	WINDOW * rulesWin = newwin(20, 35, 11, 10);
@@ -338,9 +370,17 @@ int rulesMenu(){
 }
 int playGame(){
 	readDeck();
+	WINDOW * gameWin=newwin(20,35,11,10);
+	refresh();
+	wrefresh(gameWin);
+	while(menuState=1){
+		mvwprintw(gameWin,5,0,"%s",deck[0].back);
+		wrefresh(gameWin);
+	}
+	keypad(gameWin, true);
+	int choice;
+	int highlight=0;
 }
-
-
 
 //Displays settings menu
 //Selected options  open submenus
@@ -350,11 +390,10 @@ int settingsMenu(){
 	//box(settingsWin,0,0);
 	refresh();
 	wrefresh(settingsWin);
-
 	keypad(settingsWin, true);
 	int choice;
 	int highlight=0;
-	while(1){
+	while(menuState==2){
 		for(int i=0;i<3;i++){
 			if(i==highlight){
 				wattron(settingsWin,A_REVERSE);
@@ -374,8 +413,10 @@ int settingsMenu(){
 				if(highlight==0){
 					rulesMenu();
 				}else if(highlight==1){
+					menuState=3;
 					decksMenu();
 				}else{
+					menuState=1;
 					mainMenu();
 				}
 			default:
@@ -391,39 +432,43 @@ int settingsMenu(){
 //Selected options open submenus
 int mainMenu(){
 	//Creat output window
-	WINDOW * menuwin = newwin(20, 35, 11, 10);
-	//box(menuwin,0,0);
+	WINDOW * menuWin = newwin(20, 35, 11, 10);
+	//box(menuWin,0,0);
 	refresh();
-	wrefresh(menuwin);
-	keypad(menuwin, true);
+	wrefresh(menuWin);
+	keypad(menuWin, true);
 	int choice;
 	int highlight=0;
-	while(1){
+	while(menuState==1){
 		for(int i=0;i<3;i++){
 			if(i==highlight){
-				wattron(menuwin,A_REVERSE);
+				wattron(menuWin,A_REVERSE);
 			}
-			mvwprintw(menuwin,i+1,1,menuOptions[i]);
-			wattroff(menuwin,A_REVERSE);
+			mvwprintw(menuWin,i+1,1,menuOptions[i]);
+			wattroff(menuWin,A_REVERSE);
 		}
-		choice=wgetch(menuwin);
+		choice=wgetch(menuWin);
 		switch(choice){
 			case KEY_UP:
-				highlight--;
-				if(highlight<=0){
-					highlight=0;
+				if(highlight==0){
+					break;
+				}else{
+					highlight--;
+					break;
 				}
-				break;
 			case KEY_DOWN:
-				highlight++;
-				if(highlight>=3){
-					highlight=2;
+				if(highlight==2){
+					break;
+				}else{
+					highlight++;
+					break;
 				}
-				break;
 			case KEY_RIGHT:
 				if(highlight==0){
+					menuState=4;
 					playGame();
 				}else if(highlight==1){
+					menuState=2;
 					settingsMenu();
 				}else{
 					exit(0);
@@ -431,9 +476,6 @@ int mainMenu(){
 				break;
 			default:
 				break;
-		}
-		if(choice==1){
-			settingsMenu();
 		}
 	}
 }
