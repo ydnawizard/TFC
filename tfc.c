@@ -8,6 +8,7 @@
 #include <stdio.h> //Standard input output
 #include <string.h> //String utilities
 #include <dirent.h> //Directory utilities
+#include <unistd.h>
 #include <curses.h> //Utilities for terminal based graphics
 
 //###GLOBALS###\\\
@@ -43,6 +44,13 @@ typedef struct{
 	char* back;
 	int id;
 }card;
+
+//Performance struct
+typedef struct{
+	int correct;
+	int incorrect;
+	int time;
+}results;
 
 //Initialize an array of card structs
 card *deck;
@@ -174,6 +182,8 @@ int readDeck(){
 //Displays a mutable menu of decks
 //Selected deck receives a [x] in the menu display
 int decksMenu(){
+	clear();
+	mvprintw(10,10,"%s \n","Decks:");
 	//Creat output window
 	WINDOW * decksWin = newwin(20, 35, 11, 10);
 	//box(settingsWin,0,0);
@@ -230,6 +240,8 @@ int decksMenu(){
 //Displays a mutable menu of game rules
 //Changing the rules changes the menuState of rules struct gameRules
 int rulesMenu(){
+	clear();
+	mvprintw(10,10,"%s \n","Rules:");
 	//Creat output window
 	WINDOW * rulesWin = newwin(20, 35, 11, 10);
 	refresh();
@@ -369,22 +381,104 @@ int rulesMenu(){
 	}
 }
 int playGame(){
+	int i=0;
+	int j=0;
+	results performance;
+	performance.correct=0;
+	performance.incorrect=0;
+	performance.time=0;
 	readDeck();
-	WINDOW * gameWin=newwin(20,35,11,10);
+	clear();
+	mvprintw(10,10,"%s \n","Terminal Flash Cards");
+	WINDOW * gameWin=newwin(4,60,11,10);
+	WINDOW * answerWin=newwin(3,40,16,9);
+	wrefresh(answerWin);
+	keypad(gameWin,true);
 	refresh();
 	wrefresh(gameWin);
-	while(menuState=1){
-		mvwprintw(gameWin,5,0,"%s",deck[0].back);
-		wrefresh(gameWin);
+	int answerChar;
+	char* answer=malloc(2*sizeof(char));
+	answer[1]='\0';
+	answer[0]=' ';
+	int timer=0;
+	if(gameRules.timer!=0){
+		timer=gameRules.timer;
 	}
-	keypad(gameWin, true);
-	int choice;
-	int highlight=0;
+	while(menuState=1){
+		if(strcmp(gameRules.orientation,"front")==0&&gameRules.timer==0){
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card ID:",deck[i].id);
+			mvwprintw(gameWin,3,40,"%s%s \n","Timer:","none");
+			wborder(answerWin,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+			mvwprintw(answerWin,1,1,"%s",answer);
+			answer=realloc(answer,j+2*sizeof(char));
+			wrefresh(gameWin);
+			wrefresh(answerWin);
+		}
+		if(strcmp(gameRules.orientation,"front")==0&&gameRules.timer!=0){
+			if(timer==-1){
+				performance.incorrect+=1;
+				i+=1;
+				timer=gameRules.timer;
+			}
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
+			mvwprintw(gameWin,3,40,"%s%d \n","Timer:",timer);
+			mvwprintw(gameWin,1,1,"%s \n",answer);
+			wrefresh(gameWin);
+			timer-=1;
+			sleep(1);
+		}
+		if(strcmp(gameRules.orientation,"back")==0&&gameRules.timer==0){
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
+			mvwprintw(gameWin,3,40,"%s%s \n","Timer:","none");
+			wrefresh(gameWin);
+		}
+		if(strcmp(gameRules.orientation,"back")==0&&gameRules.timer!=0){
+			if(timer==-1){
+				performance.incorrect+=1;
+				i+=1;
+				timer=gameRules.timer;
+			}
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
+			mvwprintw(gameWin,3,40,"%s%d \n","Timer:",timer);
+			wrefresh(gameWin);
+			timer-=1;
+			sleep(1);
+		}
+		answer[j]=mvwgetch(answerWin,1,1);
+		answer[j+1]='\0';
+		if(answer[j]=='\n'){
+			answer[j]='\0';
+			answer=realloc(answer,j*sizeof(char));
+			if(strcmp(answer,deck[i].back)==0){
+				performance.correct+=1;
+				performance.time=gameRules.timer-timer;
+				answer=realloc(answer,2*sizeof(char));
+				answer[0]=' ';
+				answer[1]='\0';
+				wclear(answerWin);
+				j=0;
+				i+=1;
+			}
+		}else{
+			j+=1;
+		}
+	}
 }
+	
 
 //Displays settings menu
 //Selected options  open submenus
 int settingsMenu(){
+	clear();
+	mvprintw(10,10,"%s \n","Settings:");
 	//Creat output window
 	WINDOW * settingsWin = newwin(20, 35, 11, 10);
 	//box(settingsWin,0,0);
@@ -431,6 +525,8 @@ int settingsMenu(){
 //Displays Main Menu
 //Selected options open submenus
 int mainMenu(){
+	clear();
+	mvprintw(10,10,"%s %s","Terminal Flash Cards","\n");
 	//Creat output window
 	WINDOW * menuWin = newwin(20, 35, 11, 10);
 	//box(menuWin,0,0);
@@ -500,15 +596,7 @@ int main(){
 	int yMax, xMax;
 	getmaxyx(stdscr, yMax, xMax);
 
-	//Initialize Colors
-	start_color();
-	init_pair(1,COLOR_BLUE,COLOR_BLACK);
-	init_pair(2,COLOR_RED,COLOR_BLACK);
-
 	//Print Menu Title
-	attron(COLOR_PAIR(1));
-	mvprintw(10,10,"%s %s","Terminal Flash Cards","\n");
-	attroff(COLOR_PAIR(1));
 
 	mainMenu();
 	//Draw window and Print Menu
