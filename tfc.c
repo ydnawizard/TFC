@@ -9,6 +9,7 @@
 #include <string.h> //String utilities
 #include <dirent.h> //Directory utilities
 #include <unistd.h>
+#include <time.h>
 #include <curses.h> //Utilities for terminal based graphics
 
 //###GLOBALS###\\\
@@ -20,6 +21,7 @@ int settingsMenu();
 int rulesMenu();
 int decksMenu();
 int playGame();
+int postGame();
 int readDeck();
 int readDecks();
 
@@ -29,7 +31,6 @@ int readDecks();
 struct rules{
 	char* deck;
 	char* orientation;
-	int timer;
 	bool shuffle;
 	bool repeat;
 };
@@ -49,12 +50,12 @@ typedef struct{
 typedef struct{
 	int correct;
 	int incorrect;
-	int time;
 }results;
 
 //Initialize an array of card structs
 card *deck;
 
+results performance;
 //Menu state is a global int used to terminate 
 //while loops that display each menu. Its
 //value changes based on the menu displayed so that
@@ -64,12 +65,13 @@ int menuState=1;
 //Arrays for what is displayed in each menu
 char* menuOptions[3]={"Play","Settings","Quit"};
 char* settings[3]={"Rules","Decks","Back"};
-char* rules[5]={"Orientation:Front","Timer:None","Shuffle:False","Repeat:False","Back"};
+char* rules[5]={"Orientation:Front","Shuffle:False","Repeat:False","Back"};
 
 //Decks is an array of all decks in the deck directory
 //Used for menu display and gameplay
 char** decks;
 int decksLength;
+int deckLength;
 
 //Opens directory and grab names of decks
 //add deck names to a global array called decks
@@ -93,7 +95,7 @@ int readDecks(){
 			}
 		}
 		//Adds "back" to the end of decks list because
-		//decks list is acces in deck menu and a back nav option is needed
+		//decks list is accessed in deck menu and a back nav option is needed
 		decks[i]=(char*)malloc(4*sizeof(char));
 		decks[i]="back";
 		decks=(char**)realloc(decks,(i+1)*sizeof(char*));
@@ -117,10 +119,10 @@ int readDeck(){
 	//in gameRules struct
 	char deckPath[100]="./decks/";
 	strcat(deckPath,gameRules.deck);
-	//Initialize dynamic card front and card back strings;
+	//Alllocate memory for dynamic card front and card back strings;
 	char* front=malloc(sizeof(char));
 	char* back=malloc(sizeof(char));
-	//Allocate memory for global deck of card structs array
+	//Allocate memory for dynamic global deck of card structs array
 	deck=(card*)malloc(sizeof(card));
 	//Initialize file pointer
 	FILE* deckFile=fopen(deckPath,"read");
@@ -175,6 +177,7 @@ int readDeck(){
 			deck=realloc(deck,(cardCount+1)*sizeof(card));
 		}
 	}
+	deckLength=cardCount;
 	//close/free file pointer
 	fclose(deckFile);
 }
@@ -182,6 +185,7 @@ int readDeck(){
 //Displays a mutable menu of decks
 //Selected deck receives a [x] in the menu display
 int decksMenu(){
+	curs_set(0);
 	clear();
 	mvprintw(10,10,"%s \n","Decks:");
 	//Creat output window
@@ -240,6 +244,7 @@ int decksMenu(){
 //Displays a mutable menu of game rules
 //Changing the rules changes the menuState of rules struct gameRules
 int rulesMenu(){
+	curs_set(0);
 	clear();
 	mvprintw(10,10,"%s \n","Rules:");
 	//Creat output window
@@ -249,8 +254,8 @@ int rulesMenu(){
 	keypad(rulesWin, true);
 	int choice;
 	int highlight=0;
-	while(1){
-		for(int i=0;i<5;i++){
+	while(menuState==6){
+		for(int i=0;i<4;i++){
 			if(i==highlight){
 				wattron(rulesWin,A_REVERSE);
 			}
@@ -277,42 +282,25 @@ int rulesMenu(){
 				}
 					break;
 				}else if(highlight==1){
-					gameRules.timer+=10;
-					if(gameRules.timer>60){
-						rules[1]="Timer:None";
-						gameRules.timer=0;
-						break;
-					}else{
-						//Grabs timer value from game rules and converts to string
-						//Appends timer value to end of "Timer:" string and
-						//replaces the string in rules[3] with new timer string
-						char timer[3];
-						sprintf(timer,"%d",gameRules.timer);
-						char timerRule[7]="Timer:";
-						strcat(timerRule,timer);
-						strcat(timerRule,"  ");
-						rules[1]=timerRule;
-						break;
-					}
-				}else if(highlight==2){
 					if(gameRules.shuffle==false){
 						gameRules.shuffle=true;
-						rules[2]="Shuffle:True ";
+						rules[1]="Shuffle:True ";
 					}else{
 						gameRules.shuffle=false;
-						rules[2]="Shuffle:False";
+						rules[1]="Shuffle:False";
+					}
+					break;
+				}else if(highlight==2){
+					if(gameRules.repeat==false){
+						gameRules.repeat=true;
+						rules[2]="Repeat:True ";
+					}else{
+						gameRules.repeat=false;
+						rules[2]="Repeat:False";
 					}
 					break;
 				}else if(highlight==3){
-					if(gameRules.repeat==false){
-						gameRules.repeat=true;
-						rules[3]="Repeat:True ";
-					}else{
-						gameRules.repeat=false;
-						rules[3]="Repeat:False";
-					}
-					break;
-				}else if(highlight==4){
+					menuState=2;
 					settingsMenu();
 				break;
 				}
@@ -328,47 +316,25 @@ int rulesMenu(){
 				}
 					break;
 				}else if(highlight==1){
-					gameRules.timer-=10;
-					if(gameRules.timer==0){
-						rules[1]="Timer:None";
-						gameRules.timer=0;
-						break;
-					}else if(gameRules.timer<0){
-						gameRules.timer=60;
-						rules[1]="Timer:60  ";
-						break;
-					}
-					else{
-						//Works the same way as right arrow key function
-						//but the gameRule.timer decrementing at beginning of 
-						//last else if makes it behave different
-						char timer[3];
-						sprintf(timer,"%d",gameRules.timer);
-						char timerRule[7]="Timer:";
-						strcat(timerRule,timer);
-						strcat(timerRule,"  ");
-						rules[1]=timerRule;
-						break;
-					}
-				}else if(highlight==2){
 					if(gameRules.shuffle==false){
 						gameRules.shuffle=true;
-						rules[2]="Shuffle:True ";
+						rules[1]="Shuffle:True ";
 					}else{
 						gameRules.shuffle=false;
-						rules[2]="Shuffle:False";
+						rules[1]="Shuffle:False";
+					}
+					break;
+				}else if(highlight==2){
+					if(gameRules.repeat==false){
+						gameRules.repeat=true;
+						rules[2]="Repeat:True ";
+					}else{
+						gameRules.repeat=false;
+						rules[2]="Repeat:False";
 					}
 					break;
 				}else if(highlight==3){
-					if(gameRules.repeat==false){
-						gameRules.repeat=true;
-						rules[3]="Repeat:True ";
-					}else{
-						gameRules.repeat=false;
-						rules[3]="Repeat:False";
-					}
-					break;
-				}else if(highlight==4){
+					menuState=2;
 					settingsMenu();
 				break;
 				}
@@ -380,103 +346,11 @@ int rulesMenu(){
 		}
 	}
 }
-int playGame(){
-	int i=0;
-	int j=0;
-	results performance;
-	performance.correct=0;
-	performance.incorrect=0;
-	performance.time=0;
-	readDeck();
-	clear();
-	mvprintw(10,10,"%s \n","Terminal Flash Cards");
-	WINDOW * gameWin=newwin(4,60,11,10);
-	WINDOW * answerWin=newwin(3,40,16,9);
-	wrefresh(answerWin);
-	keypad(gameWin,true);
-	refresh();
-	wrefresh(gameWin);
-	int answerChar;
-	char* answer=malloc(2*sizeof(char));
-	answer[1]='\0';
-	answer[0]=' ';
-	int timer=0;
-	if(gameRules.timer!=0){
-		timer=gameRules.timer;
-	}
-	while(menuState=1){
-		if(strcmp(gameRules.orientation,"front")==0&&gameRules.timer==0){
-			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
-			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
-			mvwprintw(gameWin,2,40,"%s%d \n","Card ID:",deck[i].id);
-			mvwprintw(gameWin,3,40,"%s%s \n","Timer:","none");
-			wborder(answerWin,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
-			mvwprintw(answerWin,1,1,"%s",answer);
-			answer=realloc(answer,j+2*sizeof(char));
-			wrefresh(gameWin);
-			wrefresh(answerWin);
-		}
-		if(strcmp(gameRules.orientation,"front")==0&&gameRules.timer!=0){
-			if(timer==-1){
-				performance.incorrect+=1;
-				i+=1;
-				timer=gameRules.timer;
-			}
-			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
-			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
-			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
-			mvwprintw(gameWin,3,40,"%s%d \n","Timer:",timer);
-			mvwprintw(gameWin,1,1,"%s \n",answer);
-			wrefresh(gameWin);
-			timer-=1;
-			sleep(1);
-		}
-		if(strcmp(gameRules.orientation,"back")==0&&gameRules.timer==0){
-			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
-			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
-			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
-			mvwprintw(gameWin,3,40,"%s%s \n","Timer:","none");
-			wrefresh(gameWin);
-		}
-		if(strcmp(gameRules.orientation,"back")==0&&gameRules.timer!=0){
-			if(timer==-1){
-				performance.incorrect+=1;
-				i+=1;
-				timer=gameRules.timer;
-			}
-			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
-			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
-			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
-			mvwprintw(gameWin,3,40,"%s%d \n","Timer:",timer);
-			wrefresh(gameWin);
-			timer-=1;
-			sleep(1);
-		}
-		answer[j]=mvwgetch(answerWin,1,1);
-		answer[j+1]='\0';
-		if(answer[j]=='\n'){
-			answer[j]='\0';
-			answer=realloc(answer,j*sizeof(char));
-			if(strcmp(answer,deck[i].back)==0){
-				performance.correct+=1;
-				performance.time=gameRules.timer-timer;
-				answer=realloc(answer,2*sizeof(char));
-				answer[0]=' ';
-				answer[1]='\0';
-				wclear(answerWin);
-				j=0;
-				i+=1;
-			}
-		}else{
-			j+=1;
-		}
-	}
-}
-	
 
 //Displays settings menu
 //Selected options  open submenus
 int settingsMenu(){
+	curs_set(0);
 	clear();
 	mvprintw(10,10,"%s \n","Settings:");
 	//Creat output window
@@ -505,6 +379,7 @@ int settingsMenu(){
 				break;
 			case KEY_RIGHT:
 				if(highlight==0){
+					menuState=6;
 					rulesMenu();
 				}else if(highlight==1){
 					menuState=3;
@@ -525,6 +400,7 @@ int settingsMenu(){
 //Displays Main Menu
 //Selected options open submenus
 int mainMenu(){
+	curs_set(0);
 	clear();
 	mvprintw(10,10,"%s %s","Terminal Flash Cards","\n");
 	//Creat output window
@@ -576,6 +452,141 @@ int mainMenu(){
 	}
 }
 
+int playGame(){
+	curs_set(0);
+	int i=0;
+	int j=0;
+	int* dealt=malloc(deckLength+1*sizeof(char));
+	dealt[0]=0;
+	performance.correct=0;
+	performance.incorrect=0;
+	readDeck();
+	clear();
+	mvprintw(10,10,"%s \n","Terminal Flash Cards");
+	WINDOW * gameWin=newwin(4,60,11,10);
+	WINDOW * answerWin=newwin(3,40,16,9);
+	//nodelay(stdscr,true);
+	nodelay(gameWin,true);
+	//nodelay(answerWin,true);
+	wrefresh(answerWin);
+	keypad(gameWin,true);
+	refresh();
+	wrefresh(gameWin);
+	int answerChar;
+	char* answer=malloc(2*sizeof(char));
+	answer[1]='\0';
+	answer[0]=' ';
+	while(menuState==4){
+		if(strcmp(gameRules.orientation,"front")==0){
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
+			wborder(answerWin,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+			mvwprintw(answerWin,1,1,"%s",answer);
+			answer=realloc(answer,j+2*sizeof(char));
+			wrefresh(gameWin);
+			wrefresh(answerWin);
+		}
+		else if(strcmp(gameRules.orientation,"back")==0){
+			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
+			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
+			mvwprintw(gameWin,2,40,"%s%d \n","Card:",deck[i].id);
+			wborder(answerWin,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+			mvwprintw(answerWin,1,1,"%s",answer);
+			answer=realloc(answer,j+2*sizeof(char));
+			wrefresh(gameWin);
+			wrefresh(answerWin);
+		}
+		answer[j]=mvwgetch(answerWin,1,1);
+		answer[j+1]='\0';
+		if(answer[j]=='\n'){
+			answer[j]='\0';
+			answer=realloc(answer,j*sizeof(char));
+			if(strcmp(answer,deck[i].back)==0&&strcmp(gameRules.orientation,"front")==0){
+				performance.correct+=1;
+				answer=realloc(answer,2*sizeof(char));
+				answer[0]=' ';
+				answer[1]='\0';
+				wclear(answerWin);
+				j=0;
+				if(gameRules.shuffle==true&&gameRules.repeat==true){
+					i=rand()%(deckLength+1-0)+0;
+				}if(gameRules.shuffle==false&&i==deckLength){
+					exit(0);
+				}else{
+					i+=1;
+				}
+			}else if(strcmp(answer,deck[i].front)==0&&strcmp(gameRules.orientation,"back")==0){
+				performance.correct+=1;
+				answer=realloc(answer,2*sizeof(char));
+				answer[0]=' ';
+				answer[1]='\0';
+				wclear(answerWin);
+				j=0;
+				if(gameRules.shuffle==true&&gameRules.repeat==true){
+					i=rand()%(deckLength+1-0)+0;
+				}else if(gameRules.shuffle==true&&gameRules.repeat==false){
+					while(i==dealt[i]){
+						i=rand()%(deckLength+1-0)+0;
+					}
+					dealt[i]=i;
+					for(int k=0;k<=deckLength;k++){
+						if(k!=dealt[k]){
+							break;
+						}else if(k==deckLength){
+							menuState=5;
+							postGame();
+						}
+					}
+				}else if(gameRules.repeat==false&&i==deckLength-1){
+					menuState=5;
+					postGame();
+				}else{
+					i+=1;
+				}
+			}else{
+				performance.incorrect+=1;
+				answer=realloc(answer,2*sizeof(char));
+				answer[0]=' ';
+				answer[1]='\0';
+				wclear(answerWin);
+				j=0;
+			}
+		}else if(answer[j]==127){
+			if(j>1){
+				answer[j]='\0';
+				j-=1;
+				answer[j]=' ';
+				answer=realloc(answer,j*sizeof(char));
+			}else{
+				answer[0]=' ';
+				answer[1]='\0';
+			}
+		}else if(answer[j]==27){
+			menuState=5;
+			postGame();
+		}else{
+			j+=1;
+		}
+	}
+}
+	
+
+int postGame(){
+	clear();
+	mvprintw(10,10,"%s \n","Performance");
+	WINDOW * postWin=newwin(4,60,11,10);
+	refresh();
+	wrefresh(postWin);
+	keypad(postWin,true);
+	while(menuState==5){
+		mvwprintw(postWin,1,0,"%s %d \n","Correct:",performance.correct);
+		mvwprintw(postWin,2,0,"%s %d \n","Incorrect:",performance.incorrect);
+		wrefresh(postWin);
+	}
+}
+
+
 
 int main(){
 	//Read decks directory and pass into global array
@@ -583,7 +594,6 @@ int main(){
 
 	//Define default game rules
 	gameRules.orientation="front";
-	gameRules.timer=0;
 	gameRules.shuffle=false;
 	gameRules.repeat=false;
 
