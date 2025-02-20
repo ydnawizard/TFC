@@ -208,11 +208,19 @@ int decksMenu(){
 		choice=wgetch(decksWin);
 		switch(choice){
 			case KEY_UP:
-				highlight--;
-				break;
+				if(highlight==0){
+					break;
+				}else{
+					highlight--;
+					break;
+				}
 			case KEY_DOWN:
-				highlight++;
-				break;
+				if(highlight==decksLength-1){
+					break;
+				}else{
+					highlight++;
+					break;
+				}
 			case KEY_RIGHT:
 				if(highlight==decksLength-1){
 					menuState=2;
@@ -265,11 +273,19 @@ int rulesMenu(){
 		choice=wgetch(rulesWin);
 		switch(choice){
 			case KEY_UP:
-				highlight--;
-				break;
+				if(highlight==0){
+					break;
+				}else{
+					highlight--;
+					break;
+				}
 			case KEY_DOWN:
-				highlight++;
-				break;
+				if(highlight==3){
+					break;
+				}else{
+					highlight++;
+					break;
+				}
 			//Right arrow key mutates rules menu in a incrementing manner
 			case KEY_RIGHT:
 				if(highlight==0){
@@ -372,11 +388,19 @@ int settingsMenu(){
 		choice=wgetch(settingsWin);
 		switch(choice){
 			case KEY_UP:
-				highlight--;
-				break;
+				if(highlight==0){
+					break;
+				}else{
+					highlight--;
+					break;
+				}
 			case KEY_DOWN:
-				highlight++;
-				break;
+				if(highlight==2){
+					break;
+				}else{
+					highlight++;
+					break;
+				}
 			case KEY_RIGHT:
 				if(highlight==0){
 					menuState=6;
@@ -525,6 +549,12 @@ int playGame(){
 				j=0;
 				if(gameRules.shuffle==true&&gameRules.repeat==true){
 					i=rand()%(deckLength+1-0)+0;
+				}else if(gameRules.shuffle==false&&gameRules.repeat==true){
+					if(i==deckLength-1){
+						i=0;
+					}else{
+						i+=1;
+					}
 				}else if(gameRules.shuffle==true&&gameRules.repeat==false){
 					while(i==dealt[i]){
 						i=rand()%(deckLength+1-0)+0;
@@ -561,6 +591,8 @@ int playGame(){
 			}else{
 				answer[0]=' ';
 				answer[1]='\0';
+				j=0;
+				answer=realloc(answer,2*sizeof(char));
 			}
 		}else if(answer[j]==27){
 			menuState=5;
