@@ -64,6 +64,7 @@ int menuState=1;
 
 //Arrays for what is displayed in each menu
 char* menuOptions[3]={"Play","Settings","Quit"};
+char* postOptions[2]={"Replay","Main Menu"};
 char* settings[3]={"Rules","Decks","Back"};
 char* rules[5]={"Orientation:Front","Shuffle:False","Repeat:False","Back"};
 
@@ -467,6 +468,7 @@ int mainMenu(){
 					menuState=2;
 					settingsMenu();
 				}else{
+					endwin();
 					exit(0);
 				}
 				break;
@@ -607,14 +609,51 @@ int playGame(){
 int postGame(){
 	clear();
 	mvprintw(10,10,"%s \n","Performance");
-	WINDOW * postWin=newwin(4,60,11,10);
+	WINDOW * postWin=newwin(7,60,11,10);
 	refresh();
 	wrefresh(postWin);
 	keypad(postWin,true);
+	int highlight=0;
+	int choice;
 	while(menuState==5){
 		mvwprintw(postWin,1,0,"%s %d \n","Correct:",performance.correct);
 		mvwprintw(postWin,2,0,"%s %d \n","Incorrect:",performance.incorrect);
 		wrefresh(postWin);
+		for(int i=0;i<2;i++){
+			if(i==highlight){
+				wattron(postWin,A_REVERSE);
+			}
+			mvwprintw(postWin,i+5,0,postOptions[i]);
+			wattroff(postWin,A_REVERSE);
+		}
+		choice=wgetch(postWin);
+		switch(choice){
+			case KEY_UP:
+				if(highlight==0){
+					break;
+				}else{
+					highlight--;
+					break;
+				}
+			case KEY_DOWN:
+				if(highlight==1){
+					break;
+				}else{
+					highlight++;
+					break;
+				}
+			case KEY_RIGHT:
+				if(highlight==0){
+					menuState=4;
+					playGame();
+				}else if(highlight==1){
+					menuState=1;
+					mainMenu();
+				}
+				break;
+			default:
+				break;
+		}
 	}
 }
 
