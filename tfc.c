@@ -1,15 +1,13 @@
 //Terminal Flash Cards
 //A Terminal based flash card game/utility utilizing the ncurses library
 //Supports easy definition of new card decks via a text file format
-//Written by Oscillator
+//Written by Andy Weglewski
 
 //Librarys
 #include <stdlib.h> //Standard Library
 #include <stdio.h> //Standard input output
 #include <string.h> //String utilities
 #include <dirent.h> //Directory utilities
-#include <unistd.h>
-#include <time.h>
 #include <curses.h> //Utilities for terminal based graphics
 
 //###GLOBALS###\\\
@@ -664,6 +662,7 @@ int main(){
 	readDecks();
 
 	//Define default game rules
+	gameRules.deck="Hello";
 	gameRules.orientation="front";
 	gameRules.shuffle=false;
 	gameRules.repeat=false;
@@ -689,10 +688,3 @@ int main(){
 	return 0;
 }
 
-
-
-
-
-
-
-/*unsigned char title[56] ={0x20, 0x20, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x5F, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x5F, 0x5F, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x0A, 0x20, 0x2F, 0x5F, 0x20, 0x20, 0x5F, 0x5F, 0x2F, 0x5F, 0x5F, 0x20, 0x20, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x5F, 0x20, 0x5F, 5F 5F 20 20 28 5F 29 5F 5F 5F 20 20 5F 5F 5F 5F 20 5F 2F 20 2F 20 20 20 20 20 20 20 20 0A 20 20 2F 20 2F 20 2F 20 5F 20 5C 2F 20 5F 5F 5F 2F 20 5F 5F 20 60 5F 5F 20 5C 2F 20 2F 20 5F 5F 20 5C 2F 20 5F 5F 20 60 2F 20 2F 20 20 20 20 20 20 20 20 20 0A 20 2F 20 2F 20 2F 20 20 5F 5F 2F 20 2F 20 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 20 2F 5F 2F 20 2F 20 2F 20 20 20 20 20 20 20 20 20 20 0A 2F 5F 2F 20 20 5C 5F 5F 5F 2F 5F 2F 20 20 2F 5F 2F 5F 2F 5F 2F 5F 2F 5F 2F 5F 2F 5F 2F 20 2F 5F 2F 5C 5F 5F 2C 5F 2F 5F 2F 20 20 20 20 20 20 20 20 20 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 5F 5F 5F 5F 2F 20 2F 5F 5F 5F 20 5F 5F 5F 5F 5F 5F 2F 20 2F 5F 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 2F 5F 20 20 2F 20 2F 20 5F 5F 20 60 2F 20 5F 5F 5F 2F 20 5F 5F 20 5C 20 20 20 20 20 20 20 20 20 20 20 20 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 5F 5F 2F 20 2F 20 2F 20 2F 5F 2F 20 28 5F 5F 20 20 29 20 2F 20 2F 20 2F 20 20 20 20 20 20 20 20 20 20 20 20 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 2F 5F 2F 20 20 20 2F 5F 2F 5C 5F 5F 2C 5F 2F 5F 5F 5F 5F 2F 5F 2F 20 2F 5F 2F 20 20 20 20 20 20 20 20 20 5F 5F 20 20 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 5F 5F 5F 5F 2F 5F 5F 5F 20 5F 5F 5F 5F 5F 5F 5F 5F 5F 5F 2F 20 2F 5F 5F 5F 5F 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 2F 20 20 20 2F 20 5F 5F 20 60 2F 20 5F 5F 5F 2F 20 5F 5F 20 20 2F 20 5F 5F 5F 2F 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 2F 20 2F 5F 5F 5F 2F 20 2F 5F 2F 20 2F 20 2F 20 20 2F 20 2F 5F 2F 20 28 5F 5F 20 20 29 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 5C 5F 5F 5F 5F 2F 5C 5F 5F 2C 5F 2F 5F 2F 20 20 20 5C 5F 5F 2C 5F 2F 5F 5F 5F 5F 2F 20 20 0A 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20*/
