@@ -82,7 +82,8 @@ int readDecks(){
 	//Must realloc because readDecks is called frequently in deck menu
 	//and decks is mutated each time
 	decks=(char**)realloc(decks,sizeof(char*));
-	d=opendir("./decks/");
+	//change this if location changes
+	d=opendir("/home/andy/.local/bin/decks/");
 	if(d){
 		while((directory=readdir(d))!=NULL){
 			if(strcmp(directory->d_name,".")!=0&&strcmp(directory->d_name,"..")!=0){
@@ -116,7 +117,7 @@ int readDeck(){
 	int cardCount=0;
 	//Create complete deck path with filename from deck att.
 	//in gameRules struct
-	char deckPath[100]="./decks/";
+	char deckPath[100]="/home/andy/.local/bin/decks/";
 	strcat(deckPath,gameRules.deck);
 	//Alllocate memory for dynamic card front and card back strings;
 	char* front=malloc(sizeof(char));
@@ -229,8 +230,8 @@ int decksMenu(){
 					//Running read decks again returns a unmutated deck menu
 					//Graphically this erases the previous deck selection and
 					//places a [x] next to the new selection
-					readDecks();
 					gameRules.deck=realloc(gameRules.deck,strlen(decks[highlight])*sizeof(char));
+					readDecks();
 					strcpy(gameRules.deck,decks[highlight]);
 					strcat(decks[highlight],"[x]");
 					break;
@@ -290,6 +291,7 @@ int rulesMenu(){
 				if(highlight==0){
 					if(strcmp(gameRules.orientation,"front")==0){
 						gameRules.orientation="back";
+						gameRules.orientation= "back";
 						rules[0]="Orientation:Back ";
 					}else{
 						gameRules.orientation="front";
@@ -501,6 +503,7 @@ int playGame(){
 	answer[1]='\0';
 	answer[0]=' ';
 	while(menuState==4){
+		//print case for front orientation
 		if(strcmp(gameRules.orientation,"front")==0){
 			mvwprintw(gameWin,1,0,"%s \n",deck[i].front);
 			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
@@ -511,6 +514,7 @@ int playGame(){
 			wrefresh(gameWin);
 			wrefresh(answerWin);
 		}
+		//print case for back orientation
 		else if(strcmp(gameRules.orientation,"back")==0){
 			mvwprintw(gameWin,1,0,"%s \n",deck[i].back);
 			mvwprintw(gameWin,1,40,"%s%s \n","Deck:",gameRules.deck);
@@ -521,11 +525,16 @@ int playGame(){
 			wrefresh(gameWin);
 			wrefresh(answerWin);
 		}
+		//get keyboard input and add to answer array
 		answer[j]=mvwgetch(answerWin,1,1);
+		//set new null terminator
 		answer[j+1]='\0';
+		//Answer processing, procession cases for each combo of rules are subcases of selected
+		//orientation rule
 		if(answer[j]=='\n'){
 			answer[j]='\0';
 			answer=realloc(answer,j*sizeof(char));
+			//Case for when front of card is presented
 			if(strcmp(answer,deck[i].back)==0&&strcmp(gameRules.orientation,"front")==0){
 				performance.correct+=1;
 				answer=realloc(answer,2*sizeof(char));
@@ -533,13 +542,16 @@ int playGame(){
 				answer[1]='\0';
 				wclear(answerWin);
 				j=0;
+				//subcase for shuffle true and repeat true
 				if(gameRules.shuffle==true&&gameRules.repeat==true){
 					i=rand()%(deckLength+1-0)+0;
+				//subcase for shuffle false and repeat false
 				}if(gameRules.shuffle==false&&i==deckLength){
 					exit(0);
 				}else{
 					i+=1;
 				}
+			//Case for when back of card is presented
 			}else if(strcmp(answer,deck[i].front)==0&&strcmp(gameRules.orientation,"back")==0){
 				performance.correct+=1;
 				answer=realloc(answer,2*sizeof(char));
@@ -547,14 +559,17 @@ int playGame(){
 				answer[1]='\0';
 				wclear(answerWin);
 				j=0;
+				//Case for shuffle true and repeat true
 				if(gameRules.shuffle==true&&gameRules.repeat==true){
 					i=rand()%(deckLength+1-0)+0;
+				//Case for shuffle false and repeat true
 				}else if(gameRules.shuffle==false&&gameRules.repeat==true){
 					if(i==deckLength-1){
 						i=0;
 					}else{
 						i+=1;
 					}
+				//Case for shuffle true and repeat false
 				}else if(gameRules.shuffle==true&&gameRules.repeat==false){
 					while(i==dealt[i]){
 						i=rand()%(deckLength+1-0)+0;
@@ -568,6 +583,7 @@ int playGame(){
 							postGame();
 						}
 					}
+				//Case for repeat false and shuffle false
 				}else if(gameRules.repeat==false&&i==deckLength-1){
 					menuState=5;
 					postGame();
@@ -582,6 +598,8 @@ int playGame(){
 				wclear(answerWin);
 				j=0;
 			}
+		//Case for backspace press
+		//If first character, stop further deleting
 		}else if(answer[j]==127){
 			if(j>1){
 				answer[j]='\0';
@@ -594,9 +612,11 @@ int playGame(){
 				j=0;
 				answer=realloc(answer,2*sizeof(char));
 			}
+		//case for esc press
 		}else if(answer[j]==27){
 			menuState=5;
 			postGame();
+		//default 
 		}else{
 			j+=1;
 		}
@@ -604,6 +624,7 @@ int playGame(){
 }
 	
 
+//Post game screen
 int postGame(){
 	clear();
 	mvprintw(10,10,"%s \n","Performance");
@@ -662,7 +683,6 @@ int main(){
 	readDecks();
 
 	//Define default game rules
-	gameRules.deck="Hello";
 	gameRules.orientation="front";
 	gameRules.shuffle=false;
 	gameRules.repeat=false;
