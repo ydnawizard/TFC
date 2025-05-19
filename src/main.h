@@ -1,3 +1,11 @@
+//Define Constants
+int title_x = 10,
+    title_y = 10,
+    menu_x = 10,
+    menu_y = 11,
+    menu_width = 35,
+    menu_depth = 20;
+
 //Standard Library
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,3 +31,5 @@
 
 //Menus
 #include "main_menu.c"
+#include "info_menu.c"
+#include "settings_menu.c"

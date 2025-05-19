@@ -1,12 +1,5 @@
 #include "src/main.h"
 
-//Define Constants
-int title_x = 10,
-    title_y = 10,
-    menu_x = 10,
-    menu_y = 11,
-    menu_width = 35,
-    menu_length = 20;
 
 int main()
 {
@@ -15,6 +8,8 @@ int main()
 	noecho();
 	cbreak();
 	start_color();
+	init_pair(1,COLOR_RED,COLOR_BLACK);
+	init_pair(2,COLOR_CYAN,COLOR_BLACK);
 	curs_set(0);
 	keypad(stdscr,TRUE);
 	game_settings game_settings_pointer;
@@ -24,7 +19,10 @@ int main()
 		switch(state)
 		{
 			case 1:
-				main_menu();
+				main_menu(&state);
+			case 12:
+				info_menu(&state);
+
 		}
 	}
 	endwin();
