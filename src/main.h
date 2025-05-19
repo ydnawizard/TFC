@@ -33,3 +33,4 @@ int title_x = 10,
 #include "main_menu.c"
 #include "info_menu.c"
 #include "settings_menu.c"
+#include "deck_selection_menu.c"

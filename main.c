@@ -9,7 +9,7 @@ int main()
 	cbreak();
 	start_color();
 	init_pair(1,COLOR_RED,COLOR_BLACK);
-	init_pair(2,COLOR_CYAN,COLOR_BLACK);
+	init_pair(2,COLOR_BLUE,COLOR_BLACK);
 	curs_set(0);
 	keypad(stdscr,TRUE);
 	game_settings game_settings_pointer;
@@ -20,10 +20,14 @@ int main()
 		{
 			case 1:
 				main_menu(&state);
+			case 11:
+				settings_menu(&state,&game_settings_pointer);
 			case 12:
 				info_menu(&state);
-
+			case 111:
+				deck_selection_menu(&state,&game_settings_pointer);
 		}
+
 	}
 	endwin();
 }
