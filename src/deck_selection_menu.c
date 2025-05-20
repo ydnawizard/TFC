@@ -18,8 +18,9 @@ void generate_title(char ** title,game_settings * game_settings_pointer)
 	{
 		for(int i=0;i<(*game_settings_pointer).deck_count;i++)
 		{
-			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i]->name))*sizeof(char));
+			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i]->name))+1*sizeof(char));
 			strcat((*title),(*game_settings_pointer).selected_decks[i]->name);
+			strcat((*title),",");
 		}
 	}
 }
@@ -86,8 +87,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 				}
 			case KEY_DOWN:
 			case 'j':
-				if(highlight != (directory_contents_pointer.sub_directory_count + 
-							directory_contents_pointer.file_count))
+				if(highlight != (directory_contents_pointer.sub_directory_count + directory_contents_pointer.file_count))
 				{
 					highlight ++;
 					break;
@@ -109,15 +109,63 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 					highlight = 0;
 					break;
 				}
+				else if(game_settings_pointer->deck_count > 0)
+				{
+					for(int i=0;i<=game_settings_pointer->deck_count;i++)
+					{
+						if(strcmp(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count],
+									game_settings_pointer->selected_decks[i]->name) == 0)
+						{
+							for(int j=i;j<game_settings_pointer->deck_count;j++)
+							{
+								memcpy(&(*game_settings_pointer).selected_decks[j],&(*game_settings_pointer).selected_decks[j+1],sizeof(deck));
+							}
+							(*game_settings_pointer).deck_count-=1;
+							break;
+						}
+						else if(i == game_settings_pointer->deck_count - 1)
+						{
+							(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count] = malloc(sizeof(deck*));
+							(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count]->name = 
+								malloc(strlen(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count])*sizeof(char));
+							strcpy((*game_settings_pointer).selected_decks[(*game_settings_pointer).deck_count]->name,
+									directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
+							(*game_settings_pointer).deck_count += 1;
+							break;
+						}
+					}
+					/*for(int i=0;i<=game_settings_pointer->deck_count;i++)
+					{
+						if(strcmp(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count],
+									game_settings_pointer->selected_decks[i]->name) == 0)
+						{
+							for(int j=i;j<game_settings_pointer->deck_count;j++)
+							{
+								memcpy(&(*game_settings_pointer).selected_decks[j],&(*game_settings_pointer).selected_decks[j+1],sizeof(deck));
+							}
+							(*game_settings_pointer).deck_count-=1;
+							break;
+						}
+						break;
+					}*/
+					break;
+				}
 				else
 				{
 					(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count] = malloc(sizeof(deck*));
-					(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count]->name = malloc(strlen(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count])*sizeof(char));
+					(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count]->name = 
+						malloc(strlen(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count])*sizeof(char));
 					strcpy((*game_settings_pointer).selected_decks[(*game_settings_pointer).deck_count]->name,
 							directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
 					(*game_settings_pointer).deck_count += 1;
 					break;
 				}
+			case KEY_LEFT:
+			case 'h':
+				(*state) = 11;
+				return;
+			default:
+				break;
 		}
 	}
 
