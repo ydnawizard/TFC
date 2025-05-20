@@ -35,12 +35,21 @@ void read_directory_contents(
 					[file_count]
 					=malloc(strlen(directory_clean_pointer->d_name)
 							*sizeof(char));
-				for(int i=0;i<strlen(directory_clean_pointer->d_name);i++)
+				for(int i=0;i<=strlen(directory_clean_pointer->d_name);i++)
 				{
-					directory_contents_pointer->file_names
-						[file_count][i]
-						=directory_clean_pointer->d_name
-							[i];
+					if(i == strlen(directory_clean_pointer->d_name))
+					{
+						directory_contents_pointer->file_names
+							[file_count][i]
+							='\0';
+					}
+					else
+					{
+						directory_contents_pointer->file_names
+							[file_count][i]
+							=directory_clean_pointer->d_name
+								[i];
+					}
 				}
 				file_count+=1;
 			}

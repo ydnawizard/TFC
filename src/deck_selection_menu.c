@@ -18,8 +18,8 @@ void generate_title(char ** title,game_settings * game_settings_pointer)
 	{
 		for(int i=0;i<(*game_settings_pointer).deck_count;i++)
 		{
-			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i].name))*sizeof(char));
-			strcat((*title),(*game_settings_pointer).selected_decks[i].name);
+			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i]->name))*sizeof(char));
+			strcat((*title),(*game_settings_pointer).selected_decks[i]->name);
 		}
 	}
 }
@@ -42,10 +42,10 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 	strcpy(deck_path_history[path_count],deck_path);
 	directory_contents directory_contents_pointer;
 	read_directory_contents(&directory_contents_pointer,deck_path);
-	generate_title(&title,&(*game_settings_pointer));
 	WINDOW * menu_win = newwin(menu_depth,menu_width,menu_y,menu_x);
 	while( (*state) == 111)
 	{
+		generate_title(&title,&(*game_settings_pointer));
 		attron(COLOR_PAIR(2));
 		mvprintw(title_y,title_x,"%s\n",title);
 		attroff(COLOR_PAIR(2));
@@ -111,10 +111,12 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 				}
 				else
 				{
-					(*game_settings_pointer).selected_decks[(*game_settings_pointer).deck_count].name = malloc(25*sizeof(char));
-					strcpy((*game_settings_pointer).selected_decks[(*game_settings_pointer).deck_count].name,
+					(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count] = malloc(sizeof(deck*));
+					(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count]->name = malloc(strlen(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count])*sizeof(char));
+					strcpy((*game_settings_pointer).selected_decks[(*game_settings_pointer).deck_count]->name,
 							directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
 					(*game_settings_pointer).deck_count += 1;
+					break;
 				}
 		}
 	}

@@ -17,6 +17,7 @@ int main()
 	game_settings_pointer.repeat = false;
 	game_settings_pointer.shuffle = false;
 	game_settings_pointer.deck_count = 0;
+	game_settings_pointer.selected_decks = malloc(sizeof(deck**));
 	int state = 1;
 	while(state > 0)
 	{
