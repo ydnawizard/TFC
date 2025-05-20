@@ -26,8 +26,8 @@ void main_menu(int* state)
 		key = wgetch(menu_win);
 		switch(key)
 		{
-			case KEY_UP:
 			case 'k':
+			case KEY_UP:
 				if(highlight != 0)
 				{
 					highlight-=1;
@@ -37,8 +37,8 @@ void main_menu(int* state)
 				{
 					break;
 				}
-			case KEY_DOWN:
 			case 'j':
+			case KEY_DOWN:
 				if(highlight != 2)
 				{
 					highlight+=1;

@@ -19,7 +19,6 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 			{
 				if(highlight == 4)
 				{
-					wattron(menu_win,A_REVERSE);
 					wattron(menu_win,COLOR_PAIR(1));
 				}
 				else
@@ -65,18 +64,42 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 						(*state) = 111;
 						return;
 					case 1:
-						(*state) = 112;
-						return;
+						if( (*game_settings_pointer).repeat == false)
+						{
+							(*game_settings_pointer).repeat = true;
+						}
+						else
+						{
+							(*game_settings_pointer).repeat = false;
+						}
+						break;
 					case 2:
-						(*state) = 113;
-						return;
+						if( (*game_settings_pointer).shuffle == false)
+						{
+							(*game_settings_pointer).shuffle = true;
+						}
+						else
+						{
+							(*game_settings_pointer).shuffle = false;
+						}
+						break;
 					case 3:
+						if( (*game_settings_pointer).card_orientation == 1)
+						{
+							(*game_settings_pointer).card_orientation = 0;
+						}
+						else
+						{
+							(*game_settings_pointer).card_orientation = 0;
+						}
+						break;
+					case 4:
 						(*state) = 114;
 						return;
-					case 5:
-						(*state) = 115;
-						return;
+					default:
+						break;
 				}
+				break;
 			case KEY_LEFT:
 			case 'h':
 				(*state) = 1;

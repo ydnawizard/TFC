@@ -13,6 +13,10 @@ int main()
 	curs_set(0);
 	keypad(stdscr,TRUE);
 	game_settings game_settings_pointer;
+	game_settings_pointer.card_orientation = 1;
+	game_settings_pointer.repeat = false;
+	game_settings_pointer.shuffle = false;
+	game_settings_pointer.deck_count = 0;
 	int state = 1;
 	while(state > 0)
 	{
