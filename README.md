@@ -1,4 +1,4 @@
-#TFC
+# TFC
 TFC (Terminal Flash Clards) is a lightweight flash card utlity written in C.
 It makes use of ncurses for a simple GUI and has some nice features:
 * The ability to load multiple decks per session
