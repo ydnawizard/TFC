@@ -28,6 +28,7 @@ int title_x = 10,
 //Read
 #include "read_file.c"
 #include "read_directory.c"
+#include "read_deck.c"
 
 //Menus
 #include "main_menu.c"

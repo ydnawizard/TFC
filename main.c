@@ -17,8 +17,13 @@ int main()
 	game_settings_pointer.repeat = false;
 	game_settings_pointer.shuffle = false;
 	game_settings_pointer.deck_count = 0;
-	game_settings_pointer.selected_decks = malloc(sizeof(deck**));
+	game_settings_pointer.selected_decks =(deck**)malloc(sizeof(deck*));
+	game_settings_pointer.selected_decks[0] = malloc(1*sizeof(deck));
+	game_settings_pointer.selected_decks[0]->name = 
+		malloc(1*sizeof(char));
 	int state = 1;
+	//Menu loop in this manner prevents infinite nesting
+	//Its just safer and more manageable
 	while(state > 0)
 	{
 		switch(state)
