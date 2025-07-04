@@ -158,13 +158,8 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 				}
 				else
 				{
-					for(int i=0;i<game_settings_pointer->deck_count;i++)
-					{
-						printf("%s\n",game_settings_pointer->selected_decks[i].name);
-					}
-					exit(0);
-					//(*state) = 11;
-					//return;
+					(*state) = 11;
+					return;
 				}
 			default:
 				break;

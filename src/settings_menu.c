@@ -1,5 +1,34 @@
 
-char * settings_menu_options[5] = {"Decks 󰉋", "Repeat:", "Shuffle:", "Orientation:","█ 󰫱󰫲󰫮󰫹 █"};
+
+void generate_settings_menu_options(char*** settings_menu_options,game_settings * game_settings_pointer)
+{
+	(*settings_menu_options)[0]="Decks ";
+	(*settings_menu_options)[4]="󰫽󰫹󰫮󰬆";
+	if(game_settings_pointer->repeat == false)
+	{
+		(*settings_menu_options)[1]="Repeat ";
+	}
+	else
+	{
+		(*settings_menu_options)[1]="Repeat ";
+	}
+	if(game_settings_pointer->shuffle == false)
+	{
+		(*settings_menu_options)[2]="Shuffle ";
+	}
+	else
+	{
+		(*settings_menu_options)[2]="Shuffle ";
+	}
+	if(game_settings_pointer->card_orientation == 1)
+	{
+		(*settings_menu_options)[3]="Orientation ";
+	}
+	else
+	{
+		(*settings_menu_options)[3]="Orientation ";
+	}
+}
 
 void settings_menu(int * state,game_settings * game_settings_pointer)
 {
@@ -11,8 +40,18 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 	attroff(COLOR_PAIR(2));
 	refresh();
 	WINDOW * menu_win = newwin(menu_depth,menu_width,menu_y,menu_x);
+	char** settings_menu_options=malloc(5*sizeof(char*));
+	for(int i=0;i<5;i++)
+	{
+		settings_menu_options[i]=malloc(32*sizeof(char));
+		for(int j=0;j<32;j++)
+		{
+			settings_menu_options[i][j]='\0';
+		}
+	}
 	while( (*state) == 11)
 	{
+		generate_settings_menu_options(&settings_menu_options,game_settings_pointer);
 		for(int i=0;i<5;i++)
 		{
 			if(i == highlight)
@@ -90,7 +129,7 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 						}
 						else
 						{
-							(*game_settings_pointer).card_orientation = 0;
+							(*game_settings_pointer).card_orientation = 1;
 						}
 						break;
 					case 4:
