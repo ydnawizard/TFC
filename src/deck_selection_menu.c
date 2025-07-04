@@ -109,6 +109,31 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 					local_sub_tick = 0;
 					break;
 				}
+				else if(game_settings_pointer->deck_count > 0)
+				{
+					for(int i=0;i<game_settings_pointer->deck_count;i++)
+						if(strcmp(directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count],
+									game_settings_pointer->selected_decks[i].name)==0)
+						{
+							for(int j=i;j<game_settings_pointer->deck_count;j++)
+							{
+								memcpy(&(*game_settings_pointer).selected_decks[j],&(*game_settings_pointer).selected_decks[j+1],sizeof(deck));
+							}
+							game_settings_pointer->deck_count-=1;
+							break;
+						}
+						else if(i == game_settings_pointer->deck_count - 1)
+						{
+							deck temp_deck;
+							char temp_path[128];
+							strcpy(temp_path,deck_path);
+							strcat(temp_path,directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
+							read_deck_file(&(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count],temp_path);
+							game_settings_pointer->deck_count+=1;
+							break;
+						}
+					break;
+				}
 				else
 				{
 					deck temp_deck;
