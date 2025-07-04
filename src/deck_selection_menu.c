@@ -18,8 +18,8 @@ void generate_title(char ** title,game_settings * game_settings_pointer)
 	{
 		for(int i=0;i<(*game_settings_pointer).deck_count;i++)
 		{
-			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i]->name))+1*sizeof(char));
-			strcat((*title),(*game_settings_pointer).selected_decks[i]->name);
+			(*title)=realloc((*title),(strlen((*title))+strlen((*game_settings_pointer).selected_decks[i].name))+2*sizeof(char));
+			strcat((*title),(*game_settings_pointer).selected_decks[i].name);
 			strcat((*title),",");
 		}
 	}
@@ -36,7 +36,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 	char * title;
 	title = malloc(sizeof(char));
 	title[0] = '\0';
-	char deck_path[64];
+	char deck_path[128];
 	char * deck_path_history[10];
 	strcpy(deck_path,"decks/");
 	deck_path_history[path_count]=malloc(strlen(deck_path)*sizeof(char));
@@ -102,7 +102,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 					strcat(deck_path,directory_contents_pointer.sub_directory_names[highlight]);
 					strcat(deck_path,"/");
 					path_count += 1;
-					deck_path_history[path_count]=malloc(32*sizeof(char));
+					deck_path_history[path_count]=malloc(64*sizeof(char));
 					strcpy(deck_path_history[path_count],deck_path);
 					read_directory_contents(&directory_contents_pointer,deck_path);
 					highlight = 0;
@@ -112,31 +112,34 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 				else
 				{
 					deck temp_deck;
-					strcat(deck_path,directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
-					/*mvwprintw(menu_win,0,0,"%s\n",deck_path);
-					wrefresh(menu_win);
-					exit(0);*/
-					read_deck_file(&temp_deck,deck_path);
-					game_settings_pointer->selected_decks[game_settings_pointer->deck_count]=realloc(
-							game_settings_pointer->selected_decks[game_settings_pointer->deck_count],sizeof(temp_deck));
-					memcpy(game_settings_pointer->selected_decks[game_settings_pointer->deck_count],&temp_deck,sizeof(&temp_deck));
+					char temp_path[128];
+					strcpy(temp_path,deck_path);
+					strcat(temp_path,directory_contents_pointer.file_names[highlight-directory_contents_pointer.sub_directory_count]);
+					read_deck_file(&(*game_settings_pointer).selected_decks[game_settings_pointer->deck_count],temp_path);
 					game_settings_pointer->deck_count+=1;
 					break;
 				}
 			case 'h':
 				if(path_count > 0)
 				{
+					memset(deck_path_history[path_count],'\0',strlen(deck_path_history[path_count]));
 					path_count -= 1;
 					memset(deck_path,'\0',strlen(deck_path));
 					strcpy(deck_path,deck_path_history[path_count]);
+					printf("%s\n",deck_path_history[0]);
 					read_directory_contents(&directory_contents_pointer,deck_path);
 					highlight=0;
 					break;
 				}
 				else
 				{
-					(*state) = 11;
-					return;
+					for(int i=0;i<game_settings_pointer->deck_count;i++)
+					{
+						printf("%s\n",game_settings_pointer->selected_decks[i].name);
+					}
+					exit(0);
+					//(*state) = 11;
+					//return;
 				}
 			default:
 				break;

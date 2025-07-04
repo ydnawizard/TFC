@@ -38,9 +38,6 @@ void read_deck_file(deck* deck_pointer,char* deck_file_path_suffix)
 	char* title_pointer;
 	title_pointer = malloc(64*sizeof(char));
 	grab_deck_title(&title_pointer,deck_file_path);
-	printf("%s\n",title_pointer);
-	exit(0);
-	deck_pointer->name = malloc(strlen(title_pointer)*sizeof(char));
 	strcpy((*deck_pointer).name,title_pointer);
 }
 
