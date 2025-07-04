@@ -5,5 +5,5 @@ typedef struct deck
 	float average_score;
 	float average_time;
 	char name[64];
-	card* cards;
+	card cards[1];
 }deck;

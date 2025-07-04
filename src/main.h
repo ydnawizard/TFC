@@ -28,6 +28,7 @@ int title_x = 10,
 //Read
 #include "read_file.c"
 #include "read_directory.c"
+#include "read_card.c"
 #include "read_deck.c"
 
 //Menus
@@ -35,3 +36,6 @@ int title_x = 10,
 #include "info_menu.c"
 #include "settings_menu.c"
 #include "deck_selection_menu.c"
+
+//Game
+#include "play_game.c"

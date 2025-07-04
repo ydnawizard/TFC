@@ -1,5 +1,5 @@
 
-void grab_deck_title(char ** title_pointer,char * deck_file_path)
+void read_deck_name(char ** name_pointer,char * deck_file_path)
 {
 	char tmp_title[128];
 	int j=0;
@@ -16,17 +16,27 @@ void grab_deck_title(char ** title_pointer,char * deck_file_path)
 			int k=0;
 			while(j>0)
 			{
-				(*title_pointer)[k]=tmp_title[j-1];
+				(*name_pointer)[k]=tmp_title[j-1];
 				k+=1;
 				j-=1;
 			}
-			(*title_pointer)[strlen(tmp_title)]='\0';
+			(*name_pointer)[strlen(tmp_title)]='\0';
 			return;
 		}
 	}
 }
 
-void read_deck_file(deck* deck_pointer,char* deck_file_path_suffix)
+void read_deck_cards(deck * deck_pointer,char * deck_file_path)
+{
+	txt deck_contents;
+	read_text_file_contents(&deck_contents,deck_file_path);
+	while(deck_pointer->card_count < deck_contents.line_count/2)
+	{
+		read_card(deck_contents,&(*deck_pointer));
+	}
+}
+
+void read_deck_file(deck * deck_pointer,char * deck_file_path_suffix)
 {
 	char deck_file_path[128];
 	getcwd(deck_file_path,sizeof(deck_file_path));
@@ -35,9 +45,11 @@ void read_deck_file(deck* deck_pointer,char* deck_file_path_suffix)
 	//printf("%s\n",deck_file_path);
 	txt file_contents;
 	read_text_file_contents(&file_contents,deck_file_path);
-	char* title_pointer;
-	title_pointer = malloc(64*sizeof(char));
-	grab_deck_title(&title_pointer,deck_file_path);
-	strcpy((*deck_pointer).name,title_pointer);
+	char* name_pointer;
+	name_pointer = malloc(64*sizeof(char));
+	read_deck_name(&name_pointer,deck_file_path);
+	strcpy(deck_pointer->name,name_pointer);
+	deck_pointer->card_count = 0;
+	read_deck_cards(&(*deck_pointer),deck_file_path);
 }
 
