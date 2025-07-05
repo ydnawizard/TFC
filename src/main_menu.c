@@ -7,8 +7,11 @@ void main_menu(int* state)
 	    key;
 	clear();
 	attron(COLOR_PAIR(2));
-	mvprintw(title_y,title_x,"%s\n","󰬁erminal 󰫳lash 󰫰ards 󰘸");
+	mvprintw(title_y,title_x,"%s\n","󰫳󰫹󰫮󰬀󰫵 󰫰󰫮󰫿󰫱󰬀 ");
 	attroff(COLOR_PAIR(2));
+	attron(COLOR_PAIR(3));
+	mvprintw(title_y,22,"%s\n","");
+	attroff(COLOR_PAIR(3));
 	refresh();
 	WINDOW * menu_win = newwin(menu_depth,menu_width,menu_y,menu_x);
 	while( (*state) == 1 )

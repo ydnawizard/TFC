@@ -1,11 +1,11 @@
 
 void generate_title(char ** title,game_settings * game_settings_pointer)
 {
-	char* temp_title = "󰬀elected 󰫱ecks:";
-	(*title) = realloc((*title),22*sizeof(char));
-	for(int i=0;i<23;i++)
+	char* temp_title = "󰬀󰫲󰫹󰫲󰫰󰬁󰫲󰫱 󰫱󰫲󰫰󰫸󰬀:";
+	(*title) = realloc((*title),62*sizeof(char));
+	for(int i=0;i<62;i++)
 	{
-		if(i == 22)
+		if(i == 61)
 		{
 			(*title)[i]='\0';
 		}
@@ -59,7 +59,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 			{
 				wattron(menu_win,A_REVERSE);
 			}
-			mvwprintw(menu_win,local_sub_tick,0,"%s%s\n",directory_contents_pointer.sub_directory_names[local_sub_tick],"󰉋");
+			mvwprintw(menu_win,local_sub_tick,1,"%s%s\n",directory_contents_pointer.sub_directory_names[local_sub_tick],"󰉋");
 			wattroff(menu_win,A_REVERSE);
 			local_sub_tick += 1;
 		}
@@ -69,7 +69,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 			{
 				wattron(menu_win,A_REVERSE);
 			}
-			mvwprintw(menu_win,local_sub_tick+local_file_tick,0,"%s%s\n",directory_contents_pointer.file_names[local_file_tick],"󰘸");
+			mvwprintw(menu_win,local_sub_tick+local_file_tick,1,"%s%s\n",directory_contents_pointer.file_names[local_file_tick],"󰘸");
 			wattroff(menu_win,A_REVERSE);
 		}
 		wrefresh(menu_win);
