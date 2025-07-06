@@ -59,7 +59,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 			{
 				wattron(menu_win,A_REVERSE);
 			}
-			mvwprintw(menu_win,local_sub_tick,1,"%s%s\n",directory_contents_pointer.sub_directory_names[local_sub_tick],"󰉋");
+			mvwprintw(menu_win,local_sub_tick,1,"%s%s\n",directory_contents_pointer.sub_directory_names[local_sub_tick]," 󰉋");
 			wattroff(menu_win,A_REVERSE);
 			local_sub_tick += 1;
 		}
@@ -69,7 +69,7 @@ void deck_selection_menu(int * state,game_settings * game_settings_pointer)
 			{
 				wattron(menu_win,A_REVERSE);
 			}
-			mvwprintw(menu_win,local_sub_tick+local_file_tick,1,"%s%s\n",directory_contents_pointer.file_names[local_file_tick],"󰘸");
+			mvwprintw(menu_win,local_sub_tick+local_file_tick,1,"%s%s\n",directory_contents_pointer.file_names[local_file_tick]," 󰘸");
 			wattroff(menu_win,A_REVERSE);
 		}
 		wrefresh(menu_win);

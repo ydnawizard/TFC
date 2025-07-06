@@ -31,29 +31,42 @@ void generate_hud(char*** hud,game_settings * game_settings_pointer)
 	}
 }
 
-/*void generate_master_deck(deck* master_deck,game_settings * game_settings_pointer)
+void generate_master_deck(deck * master, game_settings * game_settings_pointer)
 {
-	for(int i=0;i<game_settings_pointer->deck_count;i++)
+	master->card_count = 0;
+	for(int i=0;i < game_settings_pointer->deck_count; i++)
 	{
-		//printf("%d\n",game_settings_pointer->deck_count);
-		for(int j=0;j<game_settings_pointer->selected_decks[i].card_count;j++)
+		int card_count = game_settings_pointer->selected_decks[i].card_count;
+		for(int j=0;j < card_count; j++)
 		{
-			//printf("%d\n",game_settings_pointer->selected_decks[i].card_count);
-			strcpy(master_deck->cards[j].front,game_settings_pointer->selected_decks->cards[j].front);
-			printf("%d\n",j);
-			master_deck->card_count += 1;
+			//master->cards[master->card_count].front = malloc(strlen(game_settings_pointer->selected_decks[i].cards[j].front)*sizeof(char));
+			strcpy((*master).cards[master->card_count].front,game_settings_pointer->selected_decks[i].cards[j].front);
+			//master->cards[master->card_count].back = malloc(strlen(game_settings_pointer->selected_decks[i].cards[j].back)*sizeof(char));
+			strcpy((*master).cards[master->card_count].back,game_settings_pointer->selected_decks[i].cards[j].back);
+			master->card_count += 1;
 		}
 	}
-}*/
+}
 
+int grab_total_card_count(game_settings * game_settings_pointer)
+{
+	int card_count = 0;
+	for(int i=0;i < game_settings_pointer->deck_count; i++)
+	{
+		card_count += game_settings_pointer->selected_decks[i].card_count;
+	}
+	return card_count;
+}
 
 void play_game(int * state,game_settings * game_settings_pointer)
 {
 	clear();
 	refresh();
 	int highlight = 0,
+	    card_index = 0,
+	    deck_index = 0,
+	    card_count = grab_total_card_count(&(*game_settings_pointer)),
 	    key;
-	srand(time(NULL));
 	WINDOW* profile_win = newwin(3,75,2,2);
 	WINDOW* question_win = newwin(10,75,5,5);
 	WINDOW* answer_win = newwin(4,75,15,5);
@@ -65,6 +78,8 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	wrefresh(answer_win);
 	wrefresh(hud_win);
 	char** hud = malloc((4+game_settings_pointer->deck_count)*sizeof(char*));
+	deck master;
+	generate_master_deck(&master,&(*game_settings_pointer));
 	for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
 	{
 		hud[i]=malloc(32*sizeof(char));
@@ -74,6 +89,8 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		}
 	}
 	generate_hud(&hud,&(*game_settings_pointer));
+	//For some reason the state is lost after generate master is called, so redefine it here
+	(*state) = 114;
 	while((*state) == 114)
 	{
 		for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
@@ -87,6 +104,18 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		mvwprintw(profile_win,2,3,"󰫽󰫿󰫼󰫳󰫶󰫹󰫲:");
 		wattroff(profile_win,COLOR_PAIR(2));
 		wrefresh(profile_win);
+		if(game_settings_pointer->shuffle == true)
+		{
+			deck_index = rand() % game_settings_pointer->deck_count + 1;
+			card_index = rand() % card_count + 1;
+			printf("%d\n",card_index);
+			exit(0);
+		}
+		if(game_settings_pointer->repeat == false)
+		{
+		}
+		mvwprintw(question_win,2,2,"%s",master.cards[0].back);
+		wrefresh(question_win);
 		key = wgetch(question_win);
 		switch(key)
 		{

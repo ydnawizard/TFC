@@ -5,6 +5,6 @@ typedef struct card
 	int type;
 	float average_correct;
 	float average_time;
-	char* front;
-	char* back;
+	char front[256];
+	char back[256];
 }card;

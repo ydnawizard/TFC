@@ -33,6 +33,7 @@ void read_deck_cards(deck * deck_pointer,char * deck_file_path)
 	while(deck_pointer->card_count < deck_contents.line_count/2)
 	{
 		read_card(deck_contents,&(*deck_pointer));
+		deck_pointer->card_count += 1;
 	}
 }
 

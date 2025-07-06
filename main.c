@@ -3,6 +3,7 @@
 
 int main()
 {
+	srand(time(NULL));
 	setlocale(LC_ALL,"en_US.UTF-8");
 	initscr();
 	noecho();
