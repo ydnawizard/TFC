@@ -72,6 +72,17 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 	}
 }
 
+void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master)
+{
+	(*answer)[(*answer_index)] = (*key);
+	(*answer_index) += 1;
+	if(strcmp((*answer),master->cards[(*card_index)].back) == 0)
+	{
+		exit(0);
+	}
+}
+
+
 void play_game(int * state,game_settings * game_settings_pointer)
 {
 	//Ncurses housekeeping and new wins
@@ -103,7 +114,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		drawn_cards[i] = 0;
 	}
 	//Hud 
-	char** hud;
+	char ** hud;
 	hud = malloc((4+game_settings_pointer->deck_count)*sizeof(char*));
 	for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
 	{
@@ -117,7 +128,8 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	//Answer
 	char* answer;
 	answer = malloc(256*sizeof(char));
-	answer[0] = '\0';
+	memset(answer,'\0',256);
+	//main loop
 	while((*state) == 114)
 	{
 		for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
@@ -133,7 +145,11 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		wrefresh(profile_win);
 		shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
 		mvwprintw(question_win,2,2,"%s",master.cards[card_index].front);
+		wrefresh(question_win);
 		key = wgetch(question_win);
+		answer_handler(&key,&answer,&answer_index,&card_index,&master);
+		mvwprintw(answer_win,1,2,"%s",answer);
+		wrefresh(answer_win);
 		switch(key)
 		{
 		}
