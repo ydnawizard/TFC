@@ -2,32 +2,33 @@ void generate_hud(char*** hud,game_settings * game_settings_pointer)
 {
 	if(game_settings_pointer->repeat == false)
 	{
-		(*hud)[0]="󰫿󰫲󰫽󰫲󰫮󰬁 ";
+		(*hud)[1]="󰫿󰫲󰫽󰫲󰫮󰬁 ";
 	}
 	else
 	{
-		(*hud)[0]="󰫿󰫲󰫽󰫲󰫮󰬁 ";
+		(*hud)[1]="󰫿󰫲󰫽󰫲󰫮󰬁 ";
 	}
 	if(game_settings_pointer->shuffle == false)
 	{
-		(*hud)[1]="󰬀󰫵󰬂󰫳󰫳󰫹󰫲 ";
+		(*hud)[2]="󰬀󰫵󰬂󰫳󰫳󰫹󰫲 ";
 	}
 	else
 	{
-		(*hud)[1]="󰬀󰫵󰬂󰫳󰫳󰫹󰫲 ";
+		(*hud)[2]="󰬀󰫵󰬂󰫳󰫳󰫹󰫲 ";
 	}
 	if(game_settings_pointer->card_orientation == 1)
 	{
-		(*hud)[2]="󰫼󰫿󰫶󰫲󰫻󰬁󰫮󰬁󰫶󰫼󰫻 ";
+		(*hud)[3]="󰫼󰫿󰫶󰫲󰫻󰬁󰫮󰬁󰫶󰫼󰫻 ";
 	}
 	else
 	{
-		(*hud)[2]="󰫼󰫿󰫶󰫲󰫻󰬁󰫮󰬁󰫶󰫼󰫻 ";
+		(*hud)[3]="󰫼󰫿󰫶󰫲󰫻󰬁󰫮󰬁󰫶󰫼󰫻 ";
 	}
-	(*hud)[3]="󰫱󰫲󰫰󰫸󰬀:";
-	for(int i=4;i < 4+game_settings_pointer->deck_count; i++)
+	(*hud)[0]="    󰬀󰫲󰬁󰬁󰫶󰫻󰫴󰬀 ";
+	(*hud)[4]="󰫱󰫲󰫰󰫸󰬀:";
+	for(int i=5;i < 5+game_settings_pointer->deck_count; i++)
 	{
-		strcpy((*hud)[i],game_settings_pointer->selected_decks[i-4].name);
+		strcpy((*hud)[i],game_settings_pointer->selected_decks[i-5].name);
 	}
 }
 
@@ -74,11 +75,30 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 
 void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master)
 {
-	(*answer)[(*answer_index)] = (*key);
-	(*answer_index) += 1;
-	if(strcmp((*answer),master->cards[(*card_index)].back) == 0)
+	if((*key) == '\n')
 	{
-		exit(0);
+		if(strcmp((*answer),master->cards[(*card_index)].back) == 0)
+		{
+			exit(0);
+		}
+		else
+		{
+			memset((*answer),' ',72);
+			(*answer_index) = 0;
+			return;
+		}
+	}
+	else if((*key) == 127)
+	{
+		(*answer)[(*answer_index)]='\0';
+		(*answer_index) -= 1;
+		(*answer)[(*answer_index)]=' ';
+	}
+	else
+	{
+		(*answer)[(*answer_index)] = (*key);
+		(*answer)[(*answer_index)+1] = '\0';
+		(*answer_index) += 1;
 	}
 }
 
@@ -115,8 +135,8 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	}
 	//Hud 
 	char ** hud;
-	hud = malloc((4+game_settings_pointer->deck_count)*sizeof(char*));
-	for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
+	hud = malloc((5+game_settings_pointer->deck_count)*sizeof(char*));
+	for(int i=0;i<(5+game_settings_pointer->deck_count);i++)
 	{
 		hud[i]=malloc(32*sizeof(char));
 		for(int j=0;j<32;j++)
@@ -130,29 +150,37 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	answer = malloc(256*sizeof(char));
 	memset(answer,'\0',256);
 	//main loop
+	shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
 	while((*state) == 114)
 	{
-		for(int i=0;i<(4+game_settings_pointer->deck_count);i++)
+		for(int i=0;i<(5+game_settings_pointer->deck_count);i++)
 		{
-			wattron(hud_win,COLOR_PAIR(1));
-			mvwprintw(hud_win,i+1,1,"%s",hud[i]);
-			wattroff(hud_win,COLOR_PAIR(1));
-			wrefresh(hud_win);
+			if(i>0)
+			{
+				wattron(hud_win,COLOR_PAIR(3));
+				mvwprintw(hud_win,i+1,1,"%s",hud[i]);
+				wattroff(hud_win,COLOR_PAIR(3));
+				wrefresh(hud_win);
+			}
+			else
+			{
+				wattron(hud_win,COLOR_PAIR(2));
+				mvwprintw(hud_win,i+1,1,"%s",hud[i]);
+				wattroff(hud_win,COLOR_PAIR(2));
+				wrefresh(hud_win);
+			}
 		}
 		wattron(profile_win,COLOR_PAIR(2));
 		mvwprintw(profile_win,2,3,"󰫽󰫿󰫼󰫳󰫶󰫹󰫲:");
 		wattroff(profile_win,COLOR_PAIR(2));
 		wrefresh(profile_win);
-		shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
 		mvwprintw(question_win,2,2,"%s",master.cards[card_index].front);
 		wrefresh(question_win);
 		key = wgetch(question_win);
 		answer_handler(&key,&answer,&answer_index,&card_index,&master);
 		mvwprintw(answer_win,1,2,"%s",answer);
 		wrefresh(answer_win);
-		switch(key)
-		{
-		}
+	
 	}
 
 }
