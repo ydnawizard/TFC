@@ -1,11 +1,11 @@
 
 void generate_title(char ** title,game_settings * game_settings_pointer)
 {
-	char* temp_title = "󰬀󰫲󰫹󰫲󰫰󰬁󰫲󰫱 󰫱󰫲󰫰󰫸󰬀:";
-	(*title) = realloc((*title),62*sizeof(char));
-	for(int i=0;i<62;i++)
+	char* temp_title = "󰬀󰫲󰫹󰫲󰫰󰬁󰫲󰫱 󰫱󰫲󰫰󰫸󰬀 󰘸:";
+	(*title) = realloc((*title),65*sizeof(char));
+	for(int i=0;i<65;i++)
 	{
-		if(i == 61)
+		if(i == 64)
 		{
 			(*title)[i]='\0';
 		}

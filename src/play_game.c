@@ -128,10 +128,10 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	mvwprintw(profile_win,2,3,"󰫽󰫿󰫼󰫳󰫶󰫹󰫲:");
 	wattroff(profile_win,COLOR_PAIR(2));
 	wrefresh(profile_win);
+	//Inits\\
 	//Master deck gets cards from all selected decks
 	deck master;
 	generate_master_deck(&master,&(*game_settings_pointer));
-	//Inits
 	bool next_card = false;
 	int highlight = 0,
 	    card_index = 0,
@@ -157,7 +157,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	}
 	generate_hud(&hud,&(*game_settings_pointer));
 	//Answer
-	char* answer;
+	char * answer;
 	answer = malloc(256*sizeof(char));
 	memset(answer,'\0',256);
 	//main loop
@@ -190,6 +190,9 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		if(next_card == true)
 		{
 			shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
+			mvwprintw(question_win,2,2,"%s"," \n");
+			wborder(question_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+			wrefresh(question_win);
 			next_card = false;
 		}
 	
