@@ -58,7 +58,7 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 		}
 		if(sum != master->card_count)
 		{
-			(*card_index) = rand() % master->card_count + 1;
+			(*card_index) = rand() % master->card_count;
 			(*drawn_cards)[(*card_index)] = (*card_index);
 		}
 		else
@@ -68,18 +68,21 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 	}
 	if(game_settings_pointer->shuffle == true && game_settings_pointer->repeat == true)
 	{
-			(*card_index) = rand() % master->card_count + 1;
+			(*card_index) = rand() % master->card_count;
 			(*drawn_cards)[(*card_index)] = (*card_index);
 	}
 }
 
-void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master)
+void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master,bool * next_card)
 {
 	if((*key) == '\n')
 	{
 		if(strcmp((*answer),master->cards[(*card_index)].back) == 0)
 		{
-			exit(0);
+			(*next_card) = true;
+			memset((*answer),' ',72);
+			(*answer_index) = 0;
+			return;
 		}
 		else
 		{
@@ -90,9 +93,12 @@ void answer_handler(int * key,char ** answer,int * answer_index,int * card_index
 	}
 	else if((*key) == 127)
 	{
-		(*answer)[(*answer_index)]='\0';
-		(*answer_index) -= 1;
-		(*answer)[(*answer_index)]=' ';
+		if((*answer_index) > 0)
+		{
+			(*answer)[(*answer_index)]='\0';
+			(*answer_index) -= 1;
+			(*answer)[(*answer_index)]=' ';
+		}
 	}
 	else
 	{
@@ -118,10 +124,15 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	wrefresh(question_win);
 	wrefresh(answer_win);
 	wrefresh(hud_win);
+	wattron(profile_win,COLOR_PAIR(2));
+	mvwprintw(profile_win,2,3,"󰫽󰫿󰫼󰫳󰫶󰫹󰫲:");
+	wattroff(profile_win,COLOR_PAIR(2));
+	wrefresh(profile_win);
 	//Master deck gets cards from all selected decks
 	deck master;
 	generate_master_deck(&master,&(*game_settings_pointer));
 	//Inits
+	bool next_card = false;
 	int highlight = 0,
 	    card_index = 0,
 	    answer_index = 0,
@@ -170,16 +181,17 @@ void play_game(int * state,game_settings * game_settings_pointer)
 				wrefresh(hud_win);
 			}
 		}
-		wattron(profile_win,COLOR_PAIR(2));
-		mvwprintw(profile_win,2,3,"󰫽󰫿󰫼󰫳󰫶󰫹󰫲:");
-		wattroff(profile_win,COLOR_PAIR(2));
-		wrefresh(profile_win);
 		mvwprintw(question_win,2,2,"%s",master.cards[card_index].front);
 		wrefresh(question_win);
 		key = wgetch(question_win);
-		answer_handler(&key,&answer,&answer_index,&card_index,&master);
+		answer_handler(&key,&answer,&answer_index,&card_index,&master,&next_card);
 		mvwprintw(answer_win,1,2,"%s",answer);
 		wrefresh(answer_win);
+		if(next_card == true)
+		{
+			shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
+			next_card = false;
+		}
 	
 	}
 
