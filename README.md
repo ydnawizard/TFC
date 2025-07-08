@@ -10,4 +10,5 @@ Basically: Lightweight and Functional
 A couple screenshots:
 ![20250708_14h04m49s_grim](https://github.com/user-attachments/assets/75b63f8c-4a04-4092-b892-2dd71cf8d889)
 ![20250708_14h06m03s_grim](https://github.com/user-attachments/assets/a6820899-2602-4e08-a448-f0234d36e558)
+![20250708_14h08m02s_grim](https://github.com/user-attachments/assets/488ee687-9dcf-4d78-8ca4-0efd6c53b32c)
 
