@@ -7,7 +7,7 @@ It makes use of ncurses for a simple GUI and has some nice features:
 * Simple deck definition scheme
 * Built upon a nested structure scheme for easy injection of single card and deck-wide properties
 
-Basically: Lightweight and Functional
+Basically: Lightweight and Functional<br>
 A couple screenshots:
 ![20250708_14h04m49s_grim](https://github.com/user-attachments/assets/75b63f8c-4a04-4092-b892-2dd71cf8d889)
 ![20250708_14h06m03s_grim](https://github.com/user-attachments/assets/a6820899-2602-4e08-a448-f0234d36e558)
