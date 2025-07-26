@@ -20,10 +20,9 @@ int title_x = 10,
 #include <ncurses.h>
 
 //Structs
-#include "card_struct.c"
-#include "deck_struct.c"
-#include "game_settings_struct.c"
-#include "game_struct.c"
+#include "struct_card.c"
+#include "struct_deck.c"
+#include "struct_game_settings.c"
 
 //Read
 #include "read_file.c"
@@ -33,11 +32,11 @@ int title_x = 10,
 #include "read_profile.c"
 
 //Menus
-#include "main_menu.c"
-#include "info_menu.c"
-#include "settings_menu.c"
-#include "deck_selection_menu.c"
-#include "profile_menu.c"
+#include "menu_main.c"
+#include "menu_info.c"
+#include "menu_settings.c"
+#include "menu_deck_selection.c"
+#include "menu_profile_selection.c"
 
 //Game
-#include "play_game.c"
+#include "game_play.c"

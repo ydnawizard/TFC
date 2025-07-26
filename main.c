@@ -1,7 +1,7 @@
 #include "src/main.h"
 
 
-int main()
+int main(int argc, char * argv[])
 {
 	srand(time(NULL));
 	setlocale(LC_ALL,"en_US.UTF-8");
@@ -38,7 +38,7 @@ int main()
 				info_menu(&state);
 				break;
 			case 13:
-				profile_menu(&state);
+				profile_menu(&state,&game_settings_pointer);
 				break;
 			case 111:
 				deck_selection_menu(&state,&game_settings_pointer);
