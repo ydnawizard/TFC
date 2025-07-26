@@ -4,7 +4,8 @@ char * main_menu_options[3] = {"Play","Info","Quit"};
 void main_menu(int* state)
 {
 	int highlight = 0,
-	    key;
+	    key,
+	    ctrl_key;
 	clear();
 	attron(COLOR_PAIR(2));
 	mvprintw(title_y,title_x,"%s\n","󰫳󰫹󰫮󰬀󰫵 󰫰󰫮󰫿󰫱󰬀 ");
@@ -65,6 +66,9 @@ void main_menu(int* state)
 						(*state) = 0;
 						return;
 				}
+			case 'p':
+				(*state) = 13;
+				return;
 			case 'q':
 				(*state) = 0;
 				return;

@@ -21,6 +21,7 @@ int main()
 	game_settings_pointer.shuffle = false;
 	game_settings_pointer.deck_count = 0;
 	int state = 1;
+	game_settings profiles[1];
 	//Menu loop in this manner prevents infinite nesting
 	//Its just safer and more manageable
 	while(state > 0)
@@ -35,6 +36,9 @@ int main()
 				break;
 			case 12:
 				info_menu(&state);
+				break;
+			case 13:
+				profile_menu(&state);
 				break;
 			case 111:
 				deck_selection_menu(&state,&game_settings_pointer);

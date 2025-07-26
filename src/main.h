@@ -30,12 +30,14 @@ int title_x = 10,
 #include "read_directory.c"
 #include "read_card.c"
 #include "read_deck.c"
+#include "read_profile.c"
 
 //Menus
 #include "main_menu.c"
 #include "info_menu.c"
 #include "settings_menu.c"
 #include "deck_selection_menu.c"
+#include "profile_menu.c"
 
 //Game
 #include "play_game.c"

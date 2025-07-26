@@ -39,7 +39,7 @@ void generate_master_deck(deck * master, game_settings * game_settings_pointer)
 	{
 		for(int j=0;j < game_settings_pointer->selected_decks[i].card_count; j++)
 		{
-			strcpy(master->cards[master->card_count].front,game_settings_pointer->selected_decks[i].cards[j].front);
+			strcpy(master->cards[master->card_count].g,game_settings_pointer->selected_decks[i].cards[j].front);
 			strcpy(master->cards[master->card_count].back,game_settings_pointer->selected_decks[i].cards[j].back);
 			master->card_count += 1;
 		}
@@ -181,7 +181,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 				wrefresh(hud_win);
 			}
 		}
-		mvwprintw(question_win,2,2,"%s",master.cards[card_index].front);
+		mvwprintw(question_win,2,2,"%s",master.cards[card_index].g);
 		wrefresh(question_win);
 		key = wgetch(question_win);
 		answer_handler(&key,&answer,&answer_index,&card_index,&master,&next_card);
