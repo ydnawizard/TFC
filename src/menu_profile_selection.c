@@ -64,6 +64,14 @@ void profile_menu(int * state,game_settings * game_settings_pointer)
 			case 'h':
 				(*state) = 1;
 				return;
+			case 'd':
+				remove(strcat(directory_path,profiles.file_names[highlight]));
+				memset(directory_path,'\0',64);
+				strcpy(directory_path,"profiles/");
+				read_directory_contents(&profiles,directory_path);
+				wclear(menu_win);
+				highlight -= 1;
+				break;
 		}
 	}
 }

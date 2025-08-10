@@ -44,7 +44,6 @@ void read_deck_file(deck * deck_pointer,char * deck_file_path_suffix)
 	strcat(deck_file_path,"/");
 	strcat(deck_file_path,deck_file_path_suffix);
 	printf("%s\n",deck_file_path);
-	exit(0);
 	txt file_contents;
 	read_text_file_contents(&file_contents,deck_file_path);
 	char* name_pointer;
