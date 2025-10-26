@@ -6,5 +6,5 @@ typedef struct game_settings
 	bool repeat;
 	bool shuffle;
 	int deck_count;
-	deck selected_decks[10];
+	deck selected_decks[64];
 }game_settings;

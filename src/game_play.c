@@ -185,12 +185,16 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		wrefresh(question_win);
 		key = wgetch(question_win);
 		answer_handler(&key,&answer,&answer_index,&card_index,&master,&next_card);
-		mvwprintw(answer_win,1,2,"%s",answer);
+		mvwprintw(answer_win,1,2,"%.71s",answer);
+		mvwprintw(answer_win,2,2,"%.71s",&(answer[71]));
 		wrefresh(answer_win);
 		if(next_card == true)
 		{
 			shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
 			mvwprintw(question_win,2,2,"%s"," \n");
+			wclear(answer_win);
+			wborder(answer_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+			wrefresh(answer_win);
 			wborder(question_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
 			wrefresh(question_win);
 			next_card = false;
