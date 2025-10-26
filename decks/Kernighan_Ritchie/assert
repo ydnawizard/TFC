@@ -1,0 +1,11 @@
+what does the assert header provide?
+The assert.h header file of the C Standard Library provides a macro called assert which can be used to verify assumptions made by the program and print a diagnostic message if this assumption is false
+what is [FUNC: void assert()]?
+a macro and not a function, which can be used to add diagnostics in your C program
+what type(s) does [FUNC: void assert()] take and what is it's/their name(s)?
+int expression
+what is [FUNC: static_assert()]?
+This macro issues a compile-time diagnostic if the value of a constant expression is false.
+what type(s) does [FUNC: void static_assert()] take and what is it's/their name(s)?
+boolean expression, char * message
+

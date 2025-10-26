@@ -116,8 +116,8 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	refresh();
 	WINDOW* profile_win = newwin(3,75,2,2);
 	WINDOW* question_win = newwin(10,75,5,5);
-	WINDOW* answer_win = newwin(3,75,15,5);
-	WINDOW* hud_win = newwin(13,20,5,80);
+	WINDOW* answer_win = newwin(4,75,15,5);
+	WINDOW* hud_win = newwin(14,20,5,80);
 	wborder(question_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
 	wborder(answer_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
 	wborder(hud_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);

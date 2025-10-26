@@ -1,0 +1,4 @@
+what is a regular expression?
+a mathematical way of expressing a sequence of symbols
+what is a generalized nondeterministic finite automaton?
+generalized nondeterministic finte automata are nondeterministic finite automata wherein the transition arrows may have any regular expressions as labels

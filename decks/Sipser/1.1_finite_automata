@@ -1,0 +1,16 @@
+finite automata
+models for computers with limited memory
+why are finite automata useful?
+they provide a formal framework for modeling systems with a finite number of states and transitions based on inputs
+what are the states?
+states are different points in the structure of the automaton. the automaton enters different states based on the input
+what is the alphabet?
+a finite, non empty set of symbols that the automaton reads as input to determine state transitions
+what is the transition function?
+defines the movement of the automaton from one state to another based on input symbols
+what is the set of start states?
+the state in which the machine starts before accepting any input symbols
+what is the set of accept states?
+final state of automata, which, when reached, indicates that the input symbol was part of the language of the automaton
+what is the language of a finite automaton?
+the set of all strings that the automaton accepts when processed from its initial state

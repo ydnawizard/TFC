@@ -34,7 +34,9 @@ locale
 location specific definitions like date and currency
 signal
 signal handling
+stdarg
 variadic function handling
+stdatomic
 atomic operation handling - crucial for multithreading
 stdbit
 functions for bit manipulation on fixed width ints

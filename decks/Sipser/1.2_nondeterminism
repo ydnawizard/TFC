@@ -1,0 +1,8 @@
+what is the difference between a DFA and an NFA?
+an DFA only has one route for each input symbol, an NFA has multiple
+why is every DFA an NFA but not vice versa?
+nondeterminisim is a generalization of determinism
+explain the procession of an NFA
+the NFA proceeds like the DFA, but forks when there are multiple paths for the same input. Each of these forks proceeds in paralell and if one of these tendrils accepts, the NFA accepts the string
+what is a unary alphabet?
+an alphabet containing only one symbol
