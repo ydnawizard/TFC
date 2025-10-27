@@ -37,6 +37,7 @@ int title_x = 10,
 #include "menu_settings.c"
 #include "menu_deck_selection.c"
 #include "menu_profile_selection.c"
+#include "menu_post_game.c"
 
 //Game
 #include "game_play.c"

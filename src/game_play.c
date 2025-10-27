@@ -1,3 +1,5 @@
+int first_time = 1;
+int * first_time_ptr = &first_time;
 void generate_hud(char*** hud,game_settings * game_settings_pointer)
 {
 	if(game_settings_pointer->repeat == false)
@@ -46,7 +48,8 @@ void generate_master_deck(deck * master, game_settings * game_settings_pointer)
 	}
 }
 
-void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * master,game_settings * game_settings_pointer)
+void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * master,game_settings * game_settings_pointer,
+		int * state)
 {
 	srand(time(NULL));
 	if(game_settings_pointer->shuffle == true && game_settings_pointer->repeat == false)
@@ -63,13 +66,33 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 		}
 		else
 		{
-			exit(0);
+			(*state) = 1;
+			return;
 		}
 	}
-	if(game_settings_pointer->shuffle == true && game_settings_pointer->repeat == true)
+	else if(game_settings_pointer->shuffle == true && game_settings_pointer->repeat == true)
 	{
 			(*card_index) = rand() % master->card_count;
 			(*drawn_cards)[(*card_index)] = (*card_index);
+	}
+	else if (game_settings_pointer-> shuffle == false && game_settings_pointer->repeat == false)
+	{
+		if((*first_time_ptr) == 0)
+		{
+			if((*card_index) == master->card_count - 1)
+			{
+				(*state) = 1;
+				return;
+			}
+			else
+			{
+				(*card_index) += 1;
+			}
+		}
+		else
+		{
+			(*first_time_ptr) -= 1;
+		}
 	}
 }
 
@@ -161,7 +184,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 	answer = malloc(256*sizeof(char));
 	memset(answer,'\0',256);
 	//main loop
-	shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
+	shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer),state);
 	while((*state) == 114)
 	{
 		for(int i=0;i<(5+game_settings_pointer->deck_count);i++)
@@ -190,7 +213,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		wrefresh(answer_win);
 		if(next_card == true)
 		{
-			shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer));
+			shuffle_and_repeat_handler(&card_index,&drawn_cards,&master,&(*game_settings_pointer),state);
 			mvwprintw(question_win,2,2,"%s"," \n");
 			wclear(answer_win);
 			wborder(answer_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);

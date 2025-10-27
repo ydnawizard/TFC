@@ -197,6 +197,8 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 				(*state) = 1;
 				return;
 			case 'w':
+				clear();
+				refresh();
 				wborder(profile_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
 				profile_key = 1;
 				while(profile_key>0)
