@@ -37,6 +37,33 @@ void read_deck_cards(deck * deck_pointer,char * deck_file_path)
 	}
 }
 
+void get_substring(char * target,char ** dest,int start,int stop)
+{
+	memset((*dest), '\0',32);
+	int output_index = 0;
+	for(int i = start; i <= stop;i++)
+	{
+		(*dest)[output_index] = target[i];
+		output_index+=1;
+	}
+}
+
+void resolve_location(char * deck_file_path,deck * deck_pointer)
+{
+	char * substring = malloc(32 * sizeof(char));
+	for(int i = 0; i < strlen(deck_file_path)-9;i++)
+	{
+		get_substring(deck_file_path,&substring,i,i+9);
+		if(strcmp(substring,"TFC/decks/")== 0)
+		{
+			get_substring(deck_file_path,&substring,i+10,
+					strlen(deck_file_path));
+			strcpy(deck_pointer->location,substring);
+		}
+	}
+}
+
+
 void read_deck_file(deck * deck_pointer,char * deck_file_path_suffix)
 {
 	char deck_file_path[128];
@@ -50,6 +77,7 @@ void read_deck_file(deck * deck_pointer,char * deck_file_path_suffix)
 	name_pointer = malloc(64*sizeof(char));
 	read_deck_name(&name_pointer,deck_file_path);
 	strcpy(deck_pointer->name,name_pointer);
+	resolve_location(deck_file_path,deck_pointer);
 	deck_pointer->card_count = 0;
 	read_deck_cards(&(*deck_pointer),deck_file_path);
 }

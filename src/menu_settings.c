@@ -30,10 +30,57 @@ void generate_settings_menu_options(char*** settings_menu_options,game_settings 
 	}
 }
 
+void profile_name_handler(int * key,int * name_index,char ** name,game_settings * game_settings_pointer)
+{
+	if((*key) == '\n')
+	{
+		char * file_name = malloc(strlen((*name)) + 9 * sizeof(char));
+		strcpy(file_name,"profiles/");
+		strcat(file_name,(*name));
+		FILE * profile = fopen(file_name,"w");
+		fputs((*name),profile);
+		fputs("\n",profile);
+		fprintf(profile,"%d\n",game_settings_pointer->card_orientation);
+		if(game_settings_pointer->repeat == true)
+		{
+			fprintf(profile,"%s\n","true");
+		}
+		else
+		{
+			fprintf(profile,"%s\n","false");
+		}
+		if(game_settings_pointer->shuffle == true)
+		{
+			fprintf(profile,"%s\n","true");
+		}
+		else
+		{
+			fprintf(profile,"%s\n","false");
+		}
+		fprintf(profile,"%d\n",game_settings_pointer->deck_count);
+		for(int i = 0; i < game_settings_pointer->deck_count; i++)
+		{
+			fprintf(profile,"%s\n",game_settings_pointer->selected_decks[i].location);
+		}
+		fclose(profile);
+		memset((*name),' ',72);
+		(*name_index) = 0;
+		return;
+	}
+	else
+	{
+		(*name)[(*name_index)] = (*key);
+		(*name)[(*name_index)+1] = '\0';
+		(*name_index) += 1;
+	}
+}
+
 void settings_menu(int * state,game_settings * game_settings_pointer)
 {
 	int highlight = 0,
-	    key;
+	    key,
+	    profile_key = 1,
+	    profile_name_index = 0;
 	clear();
 	attron(COLOR_PAIR(2));
 	mvprintw(title_y,title_x,"%s\n","󰬀󰫲󰬁󰬁󰫶󰫻󰫴󰬀 ");
@@ -43,7 +90,10 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 	attroff(COLOR_PAIR(4));
 	refresh();
 	WINDOW * menu_win = newwin(menu_depth,menu_width,menu_y,menu_x);
+	WINDOW * profile_win = newwin(3,20,13,5);
+	WINDOW * profile_title_win = newwin(3,20,10,5);
 	char** settings_menu_options=malloc(5*sizeof(char*));
+	char * profile_name = malloc(32 * sizeof(char));
 	for(int i=0;i<5;i++)
 	{
 		settings_menu_options[i]=malloc(32*sizeof(char));
@@ -146,6 +196,34 @@ void settings_menu(int * state,game_settings * game_settings_pointer)
 			case 'h':
 				(*state) = 1;
 				return;
+			case 'w':
+				wborder(profile_win,ACS_VLINE,ACS_VLINE,ACS_HLINE,ACS_HLINE,ACS_ULCORNER,ACS_URCORNER,ACS_LLCORNER,ACS_LRCORNER);
+				profile_key = 1;
+				while(profile_key>0)
+				{
+					wrefresh(profile_win);	
+					mvwprintw(profile_title_win,1,2,"%s","󰫽󰫿󰫼󰫳󰫶󰫹󰫲 󰬁󰫶󰬁󰫹󰫲");
+					wrefresh(profile_title_win);
+					profile_key = wgetch(profile_win);
+					profile_name_handler(&profile_key,&profile_name_index,&profile_name,game_settings_pointer);
+					mvwprintw(profile_win,1,2,"%s",profile_name);
+					wrefresh(profile_win);
+					if(profile_key == '\n')
+					{
+						profile_key = 0;
+						wclear(profile_win);
+						wclear(profile_title_win);
+						wrefresh(profile_win);
+						wrefresh(profile_title_win);	
+						attron(COLOR_PAIR(2));
+						mvprintw(title_y,title_x,"%s\n","󰬀󰫲󰬁󰬁󰫶󰫻󰫴󰬀 ");
+						attroff(COLOR_PAIR(2));
+						attron(COLOR_PAIR(4));
+						mvprintw(title_y,19,"%s\n","");
+						attroff(COLOR_PAIR(4));
+						refresh();
+					}
+				}
 		}
 	}
 }
