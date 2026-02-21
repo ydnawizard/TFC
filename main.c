@@ -46,6 +46,10 @@ int main(int argc, char * argv[])
 			case 114:
 				play_game(&state,&game_settings_pointer);
 				break;
+			case 2:
+				postgame_menu(&state, &game_settings_pointer);
+				break;
+
 		}
 
 	}

@@ -96,7 +96,7 @@ void shuffle_and_repeat_handler(int * card_index,int ** drawn_cards,deck * maste
 	}
 }
 
-void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master,bool * next_card)
+void answer_handler(int * key,char ** answer,int * answer_index,int * card_index,deck * master,bool * next_card, int * state)
 {
 	if((*key) == '\n')
 	{
@@ -113,6 +113,11 @@ void answer_handler(int * key,char ** answer,int * answer_index,int * card_index
 			(*answer_index) = 0;
 			return;
 		}
+	}
+	else if ((*key) == 27)
+	{
+		(*state) = 1;
+		return;
 	}
 	else if((*key) == 127)
 	{
@@ -207,7 +212,7 @@ void play_game(int * state,game_settings * game_settings_pointer)
 		mvwprintw(question_win,2,2,"%s",master.cards[card_index].front);
 		wrefresh(question_win);
 		key = wgetch(question_win);
-		answer_handler(&key,&answer,&answer_index,&card_index,&master,&next_card);
+		answer_handler(&key,&answer,&answer_index,&card_index,&master,&next_card,state);
 		mvwprintw(answer_win,1,2,"%.71s",answer);
 		mvwprintw(answer_win,2,2,"%.71s",&(answer[71]));
 		wrefresh(answer_win);
